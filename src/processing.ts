@@ -1,6 +1,5 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
-import * as Inputs from './namespaces/Inputs';
 
 export type Result = {
   passed: boolean;

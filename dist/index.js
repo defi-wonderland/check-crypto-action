@@ -117,10 +117,6 @@ function run() {
             core.info(result.summary);
             core.debug(`Setting outputs`);
             core.setOutput('passed', result.passed ? 'true' : 'false');
-            // if (inputs.output) {
-            //   core.debug(`Setting outputs`);
-            //   fs.writeFileSync(inputs.output, result.output);
-            // }
             core.debug(`Done`);
         }
         catch (e) {

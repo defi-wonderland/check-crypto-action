@@ -40,11 +40,6 @@ async function run(): Promise<void> {
     core.debug(`Setting outputs`);
     core.setOutput('passed', result.passed ? 'true' : 'false');
 
-    // if (inputs.output) {
-    //   core.debug(`Setting outputs`);
-    //   fs.writeFileSync(inputs.output, result.output);
-    // }
-
     core.debug(`Done`);
   } catch (e) {
     const error = e as Error;
