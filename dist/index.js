@@ -19,7 +19,6 @@ exports.parseInputs = void 0;
 const parseInputs = (getInput) => {
     var _a;
     const branch = getInput('branch');
-    // const output = getInput('output');
     let notifications;
     const notify_check = getInput('notify_check');
     const notify_issue = getInput('notify_issue');
@@ -36,7 +35,6 @@ const parseInputs = (getInput) => {
     }
     return {
         branch,
-        // output,
         onlyNotify,
         notifications,
     };
@@ -82,7 +80,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-// import fs from 'fs';
 const inputs_1 = __nccwpck_require__(6180);
 const processing_1 = __nccwpck_require__(4932);
 const notifications_1 = __nccwpck_require__(9793);
@@ -168,7 +165,6 @@ const createRun = (octokit, context, result, label) => __awaiter(void 0, void 0,
         output: {
             title,
             summary: result.summary,
-            // text: result.output,
         },
     });
 });

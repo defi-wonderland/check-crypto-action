@@ -25,7 +25,6 @@ export const createRun = async (octokit: GitHub, context: Context, result: Resul
     output: {
       title,
       summary: result.summary,
-      // text: result.output,
     },
   });
 };

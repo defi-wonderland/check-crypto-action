@@ -5,7 +5,6 @@ type GetInput = (name: string, options?: InputOptions | undefined) => string;
 
 export const parseInputs = (getInput: GetInput): Inputs.Args => {
   const branch = getInput('branch');
-  // const output = getInput('output');
 
   let notifications;
   const notify_check = getInput('notify_check');
@@ -25,7 +24,6 @@ export const parseInputs = (getInput: GetInput): Inputs.Args => {
 
   return {
     branch,
-    // output,
     onlyNotify,
 
     notifications,

@@ -1,6 +1,5 @@
 export type Args = {
   branch: string;
-  // output?: string;
   onlyNotify?: string;
 
   notifications?: {
