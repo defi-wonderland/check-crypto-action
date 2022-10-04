@@ -17,12 +17,11 @@ module.exports = JSON.parse('{"name":"@octokit/rest","version":"16.43.2","publis
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseInputs = void 0;
 const parseInputs = (getInput) => {
-    var _a;
     const branch = getInput('branch');
     let notifications;
     const notify_check = getInput('notify_check');
     const notify_issue = getInput('notify_issue');
-    const onlyNotify = (_a = getInput('only_notify')) !== null && _a !== void 0 ? _a : false;
+    const onlyNotify = getInput('only_notify') === 'true';
     if (notify_check || notify_issue) {
         const label = getInput('title');
         const token = getInput('token', { required: true });

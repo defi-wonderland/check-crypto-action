@@ -1,6 +1,6 @@
 export type Args = {
   branch: string;
-  onlyNotify?: string;
+  onlyNotify?: boolean;
 
   notifications?: {
     token: string;
