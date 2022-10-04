@@ -1,6 +1,6 @@
 name: 'Check Crypto Action'
 description: 'An action to check for crypto private keys in pushed code'
-author: 'turtlemoji'
+author: 'Wonderland'
 inputs:
   notify_pr:
     description: 'send a notification to the pull request with the output'

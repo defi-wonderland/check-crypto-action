@@ -1,6 +1,6 @@
 {
   "name": "check-crypto-action",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "An action to check for crypto private keys in pushed code",
   "main": "lib/main.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/turtlemoji/check-crypto-action.git"
+    "url": "git+https://github.com/defi-wonderland/check-crypto-action.git"
   },
   "keywords": [
     "actions",
