@@ -1,11 +1,33 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Check Crypto Action'
+description: 'An action to check for crypto private keys in pushed code'
+author: 'turtlemoji'
 inputs:
-  milliseconds: # change this
+  notify_pr:
+    description: 'send a notification to the pull request with the output'
+    required: false
+  token:
+    description: 'your GITHUB_TOKEN, used when sending the notification'
+    required: false
+  title:
+    description: 'add a title to the notifications to distinguish between multiple workflows/jobs'
+    required: false
+  notify_issue:
+    description: 'send a notification to the linked issue/pullrequest with the summary'
+    required: false
+  notify_check:
+    description: 'create a check run with the summary'
+    required: false
+  only_notify:
+    description: 'only notify the build without failing'
+    required: false
+  branch:
+    description: 'name of branch to compare'
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+outputs:
+  passed:
+    description: 'boolean describing if the test passed or not'
+  # output:
+  #   description: 'text of the diff'
 runs:
   using: 'node16'
   main: 'dist/index.js'
