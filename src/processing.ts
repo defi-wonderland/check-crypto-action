@@ -9,10 +9,13 @@ export type Result = {
 
 type AddressObject = { [key: string]: { files: string[] } };
 
-export const processDiff = (branch = 'main'): Result => {
+export const fetchDiff = (branch = 'main'): string => {
   core.debug('Fetch branch to compare');
   execSync(`git fetch origin ${branch}`);
-  const diff = execSync(`git diff origin/${branch} HEAD`).toString();
+  return execSync(`git diff origin/${branch} HEAD`).toString();
+};
+
+export const processDiff = (diff: string): Result => {
   let currentFile = '';
   let foundAddresses: AddressObject = {};
   let foundPrivates: AddressObject = {};

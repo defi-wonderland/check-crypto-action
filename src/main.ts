@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { parseInputs } from './inputs';
-import { processDiff } from './processing';
+import { fetchDiff, processDiff } from './processing';
 import { createRun, createComment } from './notifications';
 
 async function run(): Promise<void> {
@@ -10,7 +10,8 @@ async function run(): Promise<void> {
     const inputs = parseInputs(core.getInput);
 
     core.debug(`Calculating result`);
-    const result = processDiff(inputs.branch);
+    const diff = fetchDiff(inputs.branch);
+    const result = processDiff(diff);
 
     if (inputs.notifications) {
       core.debug(`Setting up OctoKit`);
