@@ -2,9 +2,6 @@ name: 'Check Crypto Action'
 description: 'An action to check for crypto private keys in pushed code'
 author: 'Wonderland'
 inputs:
-  notify_pr:
-    description: 'send a notification to the pull request with the output'
-    required: false
   token:
     description: 'your GITHUB_TOKEN, used when sending the notification'
     required: false
@@ -26,8 +23,6 @@ inputs:
 outputs:
   passed:
     description: 'boolean describing if the test passed or not'
-  # output:
-  #   description: 'text of the diff'
 runs:
   using: 'node16'
   main: 'dist/index.js'
