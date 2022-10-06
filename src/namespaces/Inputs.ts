@@ -1,3 +1,5 @@
+import { InputOptions } from '@actions/core';
+
 export type Args = {
   branch: string;
   onlyNotify?: boolean;
@@ -9,3 +11,5 @@ export type Args = {
     check: boolean;
   };
 };
+
+export type GetInput = (name: string, options?: InputOptions | undefined) => string;

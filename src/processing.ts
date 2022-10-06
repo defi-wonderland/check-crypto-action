@@ -8,22 +8,6 @@ export type Result = {
 
 type AddressObject = { [key: string]: { files: string[] } };
 
-const getSummary = (passed: boolean, foundAddresses: AddressObject, foundPrivates: AddressObject): string => {
-  let summary = '';
-  Object.keys(foundAddresses).forEach(key => {
-    summary += `- Found public address [${key}] in file/s ${foundAddresses[key].files.join(', ')} \n`;
-  });
-  Object.keys(foundPrivates).forEach(key => {
-    summary += `- Found possible private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
-  });
-
-  if (passed) {
-    summary += `Check succeeded, no crypto private addresses found in this diff.`;
-  }
-
-  return summary;
-};
-
 export const processDiff = (branch = 'main'): Result => {
   core.debug('Fetch branch to compare');
   execSync(`git fetch origin ${branch}`);
@@ -57,6 +41,22 @@ export const processDiff = (branch = 'main'): Result => {
     summary: getSummary(passed, foundAddresses, foundPrivates),
   };
 };
+
+function getSummary(passed: boolean, foundAddresses: AddressObject, foundPrivates: AddressObject): string {
+  let summary = '';
+  Object.keys(foundAddresses).forEach(key => {
+    summary += `- Found public address [${key}] in file/s ${foundAddresses[key].files.join(', ')} \n`;
+  });
+  Object.keys(foundPrivates).forEach(key => {
+    summary += `- Found possible private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+  });
+
+  if (passed) {
+    summary += `Check succeeded, no crypto private addresses found in this diff.`;
+  }
+
+  return summary;
+}
 
 function searchForKey(keysArray: string[], foundKeysMap: AddressObject, currentFile: string): AddressObject {
   keysArray.forEach(address => {
