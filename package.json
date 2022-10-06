@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/diff": "5.0.2",
-    "@types/node": "16.10.5",
+    "@types/node": "17.0.29",
     "@typescript-eslint/parser": "5.38.1",
     "@vercel/ncc": "0.31.1",
     "eslint": "8.24.0",

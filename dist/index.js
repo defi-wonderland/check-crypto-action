@@ -231,8 +231,8 @@ const processDiff = (branch = 'main') => {
             const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
             // NOTE Regexp for private addresses
             const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-            foundAddresses = searchForKey(publicKeysFound, foundAddresses, currentFile);
-            foundPrivates = searchForKey(privateKeysFound, foundPrivates, currentFile);
+            foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
+            foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
         }
     });
     const passed = Object.keys(foundPrivates).length == 0;
@@ -255,18 +255,19 @@ function getSummary(passed, foundAddresses, foundPrivates) {
     }
     return summary;
 }
-function searchForKey(keysArray, foundKeysMap, currentFile) {
+function getNewKeysMap(keysArray, foundKeysMap, currentFile) {
+    const newKeysMap = structuredClone(foundKeysMap);
     keysArray.forEach(address => {
         var _a;
-        if (!foundKeysMap[address] || !((_a = foundKeysMap[address]) === null || _a === void 0 ? void 0 : _a.files)) {
-            foundKeysMap[address] = { files: [currentFile] };
+        if (!newKeysMap[address] || !((_a = newKeysMap[address]) === null || _a === void 0 ? void 0 : _a.files)) {
+            newKeysMap[address] = { files: [currentFile] };
         }
-        else if (Array.isArray(foundKeysMap[address].files)) {
-            if (foundKeysMap[address].files.indexOf(currentFile) === -1)
-                foundKeysMap[address].files.push(currentFile);
+        else if (Array.isArray(newKeysMap[address].files)) {
+            if (newKeysMap[address].files.indexOf(currentFile) === -1)
+                newKeysMap[address].files.push(currentFile);
         }
     });
-    return foundKeysMap;
+    return newKeysMap;
 }
 
 

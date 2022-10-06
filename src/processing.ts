@@ -29,8 +29,8 @@ export const processDiff = (branch = 'main'): Result => {
       // NOTE Regexp for private addresses
       const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
 
-      foundAddresses = searchForKey(publicKeysFound, foundAddresses, currentFile);
-      foundPrivates = searchForKey(privateKeysFound, foundPrivates, currentFile);
+      foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
+      foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
     }
   });
 
@@ -58,14 +58,16 @@ function getSummary(passed: boolean, foundAddresses: AddressObject, foundPrivate
   return summary;
 }
 
-function searchForKey(keysArray: string[], foundKeysMap: AddressObject, currentFile: string): AddressObject {
+function getNewKeysMap(keysArray: string[], foundKeysMap: AddressObject, currentFile: string): AddressObject {
+  const newKeysMap = structuredClone(foundKeysMap);
+
   keysArray.forEach(address => {
-    if (!foundKeysMap[address] || !foundKeysMap[address]?.files) {
-      foundKeysMap[address] = { files: [currentFile] };
-    } else if (Array.isArray(foundKeysMap[address].files)) {
-      if (foundKeysMap[address].files.indexOf(currentFile) === -1) foundKeysMap[address].files.push(currentFile);
+    if (!newKeysMap[address] || !newKeysMap[address]?.files) {
+      newKeysMap[address] = { files: [currentFile] };
+    } else if (Array.isArray(newKeysMap[address].files)) {
+      if (newKeysMap[address].files.indexOf(currentFile) === -1) newKeysMap[address].files.push(currentFile);
     }
   });
 
-  return foundKeysMap;
+  return newKeysMap;
 }
