@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
+import clone from 'just-clone';
 
 export type Result = {
   passed: boolean;
@@ -59,7 +60,7 @@ function getSummary(passed: boolean, foundAddresses: AddressObject, foundPrivate
 }
 
 function getNewKeysMap(keysArray: string[], foundKeysMap: AddressObject, currentFile: string): AddressObject {
-  const newKeysMap = structuredClone(foundKeysMap);
+  const newKeysMap = clone(foundKeysMap);
 
   keysArray.forEach(address => {
     if (!newKeysMap[address] || !newKeysMap[address]?.files) {

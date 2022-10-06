@@ -209,10 +209,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.processDiff = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(3129);
+const just_clone_1 = __importDefault(__nccwpck_require__(2746));
 const processDiff = (branch = 'main') => {
     core.debug('Fetch branch to compare');
     (0, child_process_1.execSync)(`git fetch origin ${branch}`);
@@ -256,7 +260,7 @@ function getSummary(passed, foundAddresses, foundPrivates) {
     return summary;
 }
 function getNewKeysMap(keysArray, foundKeysMap, currentFile) {
-    const newKeysMap = structuredClone(foundKeysMap);
+    const newKeysMap = (0, just_clone_1.default)(foundKeysMap);
     keysArray.forEach(address => {
         var _a;
         if (!newKeysMap[address] || !((_a = newKeysMap[address]) === null || _a === void 0 ? void 0 : _a.files)) {
@@ -17455,6 +17459,67 @@ function isexe (path, options, cb) {
 
 function sync (path, options) {
   return checkStat(fs.statSync(path), path, options)
+}
+
+
+/***/ }),
+
+/***/ 2746:
+/***/ ((module) => {
+
+module.exports = clone;
+
+/*
+  Deep clones all properties except functions
+
+  var arr = [1, 2, 3];
+  var subObj = {aa: 1};
+  var obj = {a: 3, b: 5, c: arr, d: subObj};
+  var objClone = clone(obj);
+  arr.push(4);
+  subObj.bb = 2;
+  obj; // {a: 3, b: 5, c: [1, 2, 3, 4], d: {aa: 1}}
+  objClone; // {a: 3, b: 5, c: [1, 2, 3], d: {aa: 1, bb: 2}}
+*/
+
+function clone(obj) {
+  let result = obj;
+  var type = {}.toString.call(obj).slice(8, -1);
+  if (type == 'Set') {
+    return new Set([...obj].map(value => clone(value)));
+  }
+  if (type == 'Map') {
+    return new Map([...obj].map(kv => [clone(kv[0]), clone(kv[1])]));
+  }
+  if (type == 'Date') {
+    return new Date(obj.getTime());
+  }
+  if (type == 'RegExp') {
+    return RegExp(obj.source, getRegExpFlags(obj));
+  }
+  if (type == 'Array' || type == 'Object') {
+    result = Array.isArray(obj) ? [] : {};
+    for (var key in obj) {
+      // include prototype properties
+      result[key] = clone(obj[key]);
+    }
+  }
+  // primitives and non-supported objects (e.g. functions) land here
+  return result;
+}
+
+function getRegExpFlags(regExp) {
+  if (typeof regExp.source.flags == 'string') {
+    return regExp.source.flags;
+  } else {
+    var flags = [];
+    regExp.global && flags.push('g');
+    regExp.ignoreCase && flags.push('i');
+    regExp.multiline && flags.push('m');
+    regExp.sticky && flags.push('y');
+    regExp.unicode && flags.push('u');
+    return flags.join('');
+  }
 }
 
 
