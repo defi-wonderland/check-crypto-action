@@ -9,7 +9,7 @@ async function run(): Promise<void> {
     core.debug(`Parsing inputs`);
     const inputs = parseInputs(core.getInput);
 
-    core.debug(`Calculate result`);
+    core.debug(`Calculating result`);
     const result = processDiff(inputs.branch);
 
     if (inputs.notifications) {
@@ -42,8 +42,9 @@ async function run(): Promise<void> {
     core.debug(`Done`);
   } catch (e) {
     const error = e as Error;
-    core.debug(`Error: ${error.message}`);
-    core.setFailed(error.message);
+    const message = error.message ?? error;
+    core.debug(`Error: ${message}`);
+    core.setFailed(message);
   }
 }
 

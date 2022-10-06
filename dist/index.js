@@ -83,11 +83,12 @@ const inputs_1 = __nccwpck_require__(6180);
 const processing_1 = __nccwpck_require__(4932);
 const notifications_1 = __nccwpck_require__(9793);
 function run() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug(`Parsing inputs`);
             const inputs = (0, inputs_1.parseInputs)(core.getInput);
-            core.debug(`Calculate result`);
+            core.debug(`Calculating result`);
             const result = (0, processing_1.processDiff)(inputs.branch);
             if (inputs.notifications) {
                 core.debug(`Setting up OctoKit`);
@@ -117,8 +118,9 @@ function run() {
         }
         catch (e) {
             const error = e;
-            core.debug(`Error: ${error.message}`);
-            core.setFailed(error.message);
+            const message = (_a = error.message) !== null && _a !== void 0 ? _a : error;
+            core.debug(`Error: ${message}`);
+            core.setFailed(message);
         }
     });
 }
