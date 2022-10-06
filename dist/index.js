@@ -89,7 +89,8 @@ function run() {
             core.debug(`Parsing inputs`);
             const inputs = (0, inputs_1.parseInputs)(core.getInput);
             core.debug(`Calculating result`);
-            const result = (0, processing_1.processDiff)(inputs.branch);
+            const diff = (0, processing_1.fetchDiff)(inputs.branch);
+            const result = (0, processing_1.processDiff)(diff);
             if (inputs.notifications) {
                 core.debug(`Setting up OctoKit`);
                 const octokit = new github.GitHub(inputs.notifications.token);
@@ -213,14 +214,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.processDiff = void 0;
+exports.processDiff = exports.fetchDiff = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(3129);
 const just_clone_1 = __importDefault(__nccwpck_require__(2746));
-const processDiff = (branch = 'main') => {
+const fetchDiff = (branch = 'main') => {
     core.debug('Fetch branch to compare');
     (0, child_process_1.execSync)(`git fetch origin ${branch}`);
-    const diff = (0, child_process_1.execSync)(`git diff origin/${branch} HEAD`).toString();
+    return (0, child_process_1.execSync)(`git diff origin/${branch} HEAD`).toString();
+};
+exports.fetchDiff = fetchDiff;
+const processDiff = (diff) => {
     let currentFile = '';
     let foundAddresses = {};
     let foundPrivates = {};
