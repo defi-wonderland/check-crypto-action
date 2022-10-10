@@ -50,7 +50,7 @@ Copyright 2022 DeFi Wonderland
     expect(result.passed).toBeTruthy();
   });
 
-  test('processDiff test logic should pass with old leak', () => {
+  test('processDiff test logic should pass with no changes to old pk', () => {
     const mockGoodDiff = `
 diff --git a/LICENSE b/LICENSE
 index a111aa1..222b2b2 222111
@@ -67,7 +67,7 @@ leak=abcd3d22222b3b0e689193235279328527${leakPart}
     expect(result.passed).toBeTruthy();
   });
 
-  test('processDiff test logic should fail', () => {
+  test('processDiff test logic should fail when modifying(+) a pk', () => {
     const mockBadDiff = `
 diff --git a/LICENSE b/LICENSE
 index a111aa1..222b2b2 222111
@@ -76,6 +76,22 @@ index a111aa1..222b2b2 222111
 @@ -1,22 +1,22 @@
 +leak=abcd3d22222b3b0e689193235279328527${leakPart}
 -The MIT License (MIT)
+Copyright 2022 DeFi Wonderland
+      `;
+    const result = processDiff(mockBadDiff);
+
+    expect(result.passed).toBeFalsy();
+  });
+
+  test('processDiff test logic should fail when modifying(-) a pk', () => {
+    const mockBadDiff = `
+diff --git a/LICENSE b/LICENSE
+index a111aa1..222b2b2 222111
+--- a/LICENSE
++++ b/LICENSE
+@@ -1,22 +1,22 @@
+-leak=abcd3d22222b3b0e689193235279328527${leakPart}
++The MIT License (MIT)
 Copyright 2022 DeFi Wonderland
       `;
     const result = processDiff(mockBadDiff);
