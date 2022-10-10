@@ -32,7 +32,7 @@ import { processDiff } from '../src/processing';
 // });
 
 describe('Main tests', () => {
-  const leakPart = '3d22222b3b0e689193235279328527dbf71f6e79781beaded0b24fdc3e22cf6fc56e';
+  const leakPart = 'dbf71f6e79781beaded0b24fdc3e22cf6fc56e';
 
   test('processDiff test logic should pass', () => {
     const mockGoodDiff = `
@@ -60,7 +60,7 @@ index a111aa1..222b2b2 222111
 +(The MIT License)
 -The MIT License (MIT)
 Copyright 2022 DeFi Wonderland
-leak=abcd${leakPart}
+leak=abcd3d22222b3b0e689193235279328527${leakPart}
     `;
     const result = processDiff(mockGoodDiff);
 
@@ -74,7 +74,7 @@ index a111aa1..222b2b2 222111
 --- a/LICENSE
 +++ b/LICENSE
 @@ -1,22 +1,22 @@
-+leak=abcd${leakPart}
++leak=abcd3d22222b3b0e689193235279328527${leakPart}
 -The MIT License (MIT)
 Copyright 2022 DeFi Wonderland
       `;
