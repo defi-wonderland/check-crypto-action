@@ -1,4 +1,4 @@
-[![build-test](https://github.com/defi-wonderland/check-crypto-action/actions/workflows/test.yml/badge.svg)](https://github.com/defi-wonderland/check-crypto-action/actions/workflows/test.yml)
+[![build-test](https://github.com/defi-wonderland/check-crypto-action/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/defi-wonderland/check-crypto-action/actions/workflows/test.yml)
 [![tag badge](https://img.shields.io/github/v/tag/defi-wonderland/check-crypto-action)](https://github.com/defi-wonderland/check-crypto-action/tags)
 [![license badge](https://img.shields.io/github/license/defi-wonderland/check-crypto-action)](./LICENSE)
 
