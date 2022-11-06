@@ -10,15 +10,15 @@ This action checks for crypto private keys in the diff code for the current comm
 
 | Input        | Description                                                                     | Default      |
 | ------------ | ------------------------------------------------------------------------------- | ------------ |
+| branch       | Name of branch to compare                                                       | **Required** |
 | token        | Your GITHUB_TOKEN, used when sending the notification                           | None         |
 | title        | Add a title to the notifications to distinguish between multiple workflows/jobs | None         |
-| notify_issue | Send a notification to the linked issue/pullrequest with the summary            | true         |
+| notify_issue | Send a notification to the linked issue/pull-request with the summary           | true         |
 | notify_check | Create a check run with the summary                                             | None         |
 | only_notify  | Only notify the build without failing                                           | None         |
-| branch       | Name of branch to compare                                                       | **Required** |
 
 **Note:**
-You will need to supply a `token` to be able to send issue notifications
+In order to send issue notifications on Github, you must supply the `token` input
 
 ## Action Outputs
 
