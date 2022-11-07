@@ -9,16 +9,38 @@ on: # rebuild any PRs and main branch changes
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - run: |
           npm install
       - run: |
           npm run all
+
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - uses: ./
         with:
-          milliseconds: 1000
+          title: Check pk only check
+          branch: dev
+          notify_issue: false
+          notify_check: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  testOnlyNotify: # make sure the action only notifies without failing
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./
+        with:
+          title: Check pk only notify
+          branch: dev
+          only_notify: true
+          token: ${{ secrets.GITHUB_TOKEN }}

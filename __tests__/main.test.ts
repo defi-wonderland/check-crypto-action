@@ -1,29 +1,72 @@
-import {wait} from '../src/wait'
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
-import {expect, test} from '@jest/globals'
+import { expect, test, describe } from '@jest/globals';
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
-})
+import { processDiff } from '../src/processing';
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
-})
+describe('Main tests', () => {
+  const leakPart = 'dbf71f6e79781beaded0b24fdc3e22cf6fc56e';
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
-  const np = process.execPath
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env
-  }
-  console.log(cp.execFileSync(np, [ip], options).toString())
-})
+  test('processDiff test logic should pass', () => {
+    const mockGoodDiff = `
+diff --git a/LICENSE b/LICENSE
+index a111aa1..222b2b2 222111
+--- a/LICENSE
++++ b/LICENSE
+@@ -1,22 +1,22 @@
++(The MIT License)
+-The MIT License (MIT)
+Copyright 2022 DeFi Wonderland
+    `;
+    const result = processDiff(mockGoodDiff);
+
+    expect(result.passed).toBeTruthy();
+  });
+
+  test('processDiff test logic should pass with no changes to old pk', () => {
+    const mockGoodDiff = `
+diff --git a/LICENSE b/LICENSE
+index a111aa1..222b2b2 222111
+--- a/LICENSE
++++ b/LICENSE
+@@ -1,22 +1,22 @@
++(The MIT License)
+-The MIT License (MIT)
+Copyright 2022 DeFi Wonderland
+leak=abcd3d22222b3b0e689193235279328527${leakPart}
+    `;
+    const result = processDiff(mockGoodDiff);
+
+    expect(result.passed).toBeTruthy();
+  });
+
+  test('processDiff test logic should fail when modifying(+) a pk', () => {
+    const mockBadDiff = `
+diff --git a/LICENSE b/LICENSE
+index a111aa1..222b2b2 222111
+--- a/LICENSE
++++ b/LICENSE
+@@ -1,22 +1,22 @@
++leak=abcd3d22222b3b0e689193235279328527${leakPart}
+-The MIT License (MIT)
+Copyright 2022 DeFi Wonderland
+      `;
+    const result = processDiff(mockBadDiff);
+
+    expect(result.passed).toBeFalsy();
+  });
+
+  test('processDiff test logic should fail when modifying(-) a pk', () => {
+    const mockBadDiff = `
+diff --git a/LICENSE b/LICENSE
+index a111aa1..222b2b2 222111
+--- a/LICENSE
++++ b/LICENSE
+@@ -1,22 +1,22 @@
+-leak=abcd3d22222b3b0e689193235279328527${leakPart}
++The MIT License (MIT)
+Copyright 2022 DeFi Wonderland
+      `;
+    const result = processDiff(mockBadDiff);
+
+    expect(result.passed).toBeFalsy();
+  });
+});
