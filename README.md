@@ -34,7 +34,7 @@ The example below shows how to `notify on a PR and check` if it finds a crypto p
 
 ```yaml
 - name: Check for private keys
-  uses: defi-wonderland/check-crypto-action@v1
+  uses: @defi-wonderland/check-crypto-action@v1
   with:
     title: Check private key and notify
     branch: dev
@@ -46,7 +46,7 @@ The example below shows how to `only check without notifying` on a PR if it find
 
 ```yaml
 - name: Check for private keys
-  uses: defi-wonderland/check-crypto-action@v1
+  uses: @defi-wonderland/check-crypto-action@v1
   with:
     title: Check private key and notify
     branch: dev
@@ -59,7 +59,7 @@ The example below shows how to `notify without ever failing` on a PR if it finds
 
 ```yaml
 - name: Check for private keys
-  uses: defi-wonderland/check-crypto-action@v1
+  uses: @defi-wonderland/check-crypto-action@v1
   with:
     title: Check private key and notify
     branch: dev
