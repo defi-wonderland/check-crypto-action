@@ -7,6 +7,7 @@ export const parseInputs = (getInput: Inputs.GetInput): Inputs.Args => {
   const notify_check = getInput('notify_check');
   const notify_issue = getInput('notify_issue');
   const onlyNotify = getInput('only_notify') === 'true';
+  const reportPublicKeys = getInput('report_public_keys') === 'true';
 
   if (notify_check || notify_issue) {
     const label = getInput('title');
@@ -22,6 +23,7 @@ export const parseInputs = (getInput: Inputs.GetInput): Inputs.Args => {
   return {
     branch,
     onlyNotify,
+    reportPublicKeys,
 
     notifications,
   };

@@ -11,7 +11,13 @@ const getTitle = (label?: string): string => {
   return `Smart Diff${more}`;
 };
 
-export const createRun = async (octokit: GitHub, context: Context, result: Result, label?: string): Promise<void> => {
+export const createRun = async (
+  octokit: GitHub,
+  context: Context,
+  result: Result,
+  summary: string,
+  label?: string,
+): Promise<void> => {
   const title = getTitle(label);
   await octokit.checks.create({
     owner: context.repo.owner,
@@ -24,7 +30,7 @@ export const createRun = async (octokit: GitHub, context: Context, result: Resul
     completed_at: formatDate(),
     output: {
       title,
-      summary: result.summary,
+      summary,
     },
   });
 };
@@ -33,6 +39,7 @@ export const createComment = async (
   octokit: GitHub,
   context: Context,
   result: Result,
+  summary: string,
   label?: string,
 ): Promise<void> => {
   await octokit.issues.createComment({
@@ -40,7 +47,7 @@ export const createComment = async (
     repo: context.repo.repo,
     issue_number: context.issue.number,
     body: `## ${getTitle(label)}: ${result.passed ? 'Success' : 'Failure'}
-${result.summary}
+${summary}
 `,
   });
 };
