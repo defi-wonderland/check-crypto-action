@@ -4,7 +4,8 @@ import clone from 'just-clone';
 
 export type Result = {
   passed: boolean;
-  summary: string;
+  foundAddresses: AddressObject;
+  foundPrivates: AddressObject;
 };
 
 type AddressObject = { [key: string]: { files: string[] } };
@@ -29,11 +30,10 @@ export const processDiff = (diff: string): Result => {
     if ((line && line[0] === '-') || line[0] === '+') {
       // NOTE Regexp for public addresses
       const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
+      foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
 
       // NOTE Regexp for private addresses
       const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-
-      foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
       foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
     }
   });
@@ -42,25 +42,43 @@ export const processDiff = (diff: string): Result => {
 
   return {
     passed,
-    summary: getSummary(passed, foundAddresses, foundPrivates),
+    foundAddresses,
+    foundPrivates,
   };
 };
 
-function getSummary(passed: boolean, foundAddresses: AddressObject, foundPrivates: AddressObject): string {
+export const getSummary = (
+  passed: boolean,
+  foundAddresses: AddressObject,
+  foundPrivates: AddressObject,
+  reportPublicKeys?: boolean,
+): string => {
   let summary = '';
-  Object.keys(foundAddresses).forEach(key => {
-    summary += `- Found public address [${key}] in file/s ${foundAddresses[key].files.join(', ')} \n`;
-  });
-  Object.keys(foundPrivates).forEach(key => {
-    summary += `- Found possible private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
-  });
+
+  const privateKeys = Object.keys(foundPrivates);
+  const publicKeys = Object.keys(foundAddresses);
+
+  if (privateKeys.length) {
+    summary += '🚨 Possible private keys found: \n';
+
+    privateKeys.forEach(key => {
+      summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+    });
+  }
+
+  if (reportPublicKeys && publicKeys.length) {
+    summary += '⚠️ Possible public keys found: \n';
+    publicKeys.forEach(key => {
+      summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
+    });
+  }
 
   if (passed) {
-    summary += `Check succeeded, no crypto private addresses found in this diff.`;
+    summary += `✅ Check succeeded, no crypto private addresses found in this diff.`;
   }
 
   return summary;
-}
+};
 
 function getNewKeysMap(keysArray: string[], foundKeysMap: AddressObject, currentFile: string): AddressObject {
   const newKeysMap = clone(foundKeysMap);

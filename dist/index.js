@@ -14,6 +14,7 @@ const parseInputs = (getInput) => {
     const notify_check = getInput('notify_check');
     const notify_issue = getInput('notify_issue');
     const onlyNotify = getInput('only_notify') === 'true';
+    const reportPublicKeys = getInput('report_public_keys') === 'true';
     if (notify_check || notify_issue) {
         const label = getInput('title');
         const token = getInput('token', { required: true });
@@ -27,6 +28,7 @@ const parseInputs = (getInput) => {
     return {
         branch,
         onlyNotify,
+        reportPublicKeys,
         notifications,
     };
 };
@@ -87,18 +89,19 @@ function run() {
             core.debug(`Calculating result`);
             const diff = (0, processing_1.fetchDiff)(inputs.branch);
             const result = (0, processing_1.processDiff)(diff);
+            const summary = (0, processing_1.getSummary)(result.passed, result.foundAddresses, result.foundPrivates, inputs.reportPublicKeys);
             if (inputs.notifications) {
                 core.debug(`Setting up OctoKit`);
                 const octokit = new github.GitHub(inputs.notifications.token);
                 if (inputs.notifications.check) {
                     core.debug(`Notification: Check Run`);
-                    yield (0, notifications_1.createRun)(octokit, github.context, result, inputs.notifications.label);
+                    yield (0, notifications_1.createRun)(octokit, github.context, result, summary, inputs.notifications.label);
                 }
                 if (inputs.notifications.issue && !result.passed) {
                     core.debug(`Notification: Issue`);
                     const issueId = github.context.issue.number;
                     if (issueId || issueId === 0) {
-                        yield (0, notifications_1.createComment)(octokit, github.context, result, inputs.notifications.label);
+                        yield (0, notifications_1.createComment)(octokit, github.context, result, summary, inputs.notifications.label);
                     }
                     else {
                         core.debug(`Notification: no issue id`);
@@ -106,9 +109,9 @@ function run() {
                 }
             }
             if (!inputs.onlyNotify && !result.passed) {
-                core.setFailed(result.summary);
+                core.setFailed(summary);
             }
-            core.info(result.summary);
+            core.info(summary);
             core.debug(`Setting outputs`);
             core.setOutput('passed', result.passed ? 'true' : 'false');
             core.debug(`Done`);
@@ -149,7 +152,7 @@ const getTitle = (label) => {
     const more = label ? ` (${label})` : '';
     return `Smart Diff${more}`;
 };
-const createRun = (octokit, context, result, label) => __awaiter(void 0, void 0, void 0, function* () {
+const createRun = (octokit, context, result, summary, label) => __awaiter(void 0, void 0, void 0, function* () {
     const title = getTitle(label);
     yield octokit.checks.create({
         owner: context.repo.owner,
@@ -162,18 +165,18 @@ const createRun = (octokit, context, result, label) => __awaiter(void 0, void 0,
         completed_at: formatDate(),
         output: {
             title,
-            summary: result.summary,
+            summary,
         },
     });
 });
 exports.createRun = createRun;
-const createComment = (octokit, context, result, label) => __awaiter(void 0, void 0, void 0, function* () {
+const createComment = (octokit, context, result, summary, label) => __awaiter(void 0, void 0, void 0, function* () {
     yield octokit.issues.createComment({
         owner: context.repo.owner,
         repo: context.repo.repo,
         issue_number: context.issue.number,
         body: `## ${getTitle(label)}: ${result.passed ? 'Success' : 'Failure'}
-${result.summary}
+${summary}
 `,
     });
 });
@@ -214,7 +217,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.processDiff = exports.fetchDiff = void 0;
+exports.getSummary = exports.processDiff = exports.fetchDiff = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(2081);
 const just_clone_1 = __importDefault(__nccwpck_require__(445));
@@ -237,32 +240,42 @@ const processDiff = (diff) => {
         if ((line && line[0] === '-') || line[0] === '+') {
             // NOTE Regexp for public addresses
             const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
+            foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
             // NOTE Regexp for private addresses
             const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-            foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
             foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
         }
     });
     const passed = Object.keys(foundPrivates).length == 0;
     return {
         passed,
-        summary: getSummary(passed, foundAddresses, foundPrivates),
+        foundAddresses,
+        foundPrivates,
     };
 };
 exports.processDiff = processDiff;
-function getSummary(passed, foundAddresses, foundPrivates) {
+const getSummary = (passed, foundAddresses, foundPrivates, reportPublicKeys) => {
     let summary = '';
-    Object.keys(foundAddresses).forEach(key => {
-        summary += `- Found public address [${key}] in file/s ${foundAddresses[key].files.join(', ')} \n`;
-    });
-    Object.keys(foundPrivates).forEach(key => {
-        summary += `- Found possible private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
-    });
+    const privateKeys = Object.keys(foundPrivates);
+    const publicKeys = Object.keys(foundAddresses);
+    if (privateKeys.length) {
+        summary += '🚨 Possible private keys found: \n';
+        privateKeys.forEach(key => {
+            summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+        });
+    }
+    if (reportPublicKeys && publicKeys.length) {
+        summary += '⚠️ Possible public keys found: \n';
+        publicKeys.forEach(key => {
+            summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
+        });
+    }
     if (passed) {
-        summary += `Check succeeded, no crypto private addresses found in this diff.`;
+        summary += `✅ Check succeeded, no crypto private addresses found in this diff.`;
     }
     return summary;
-}
+};
+exports.getSummary = getSummary;
 function getNewKeysMap(keysArray, foundKeysMap, currentFile) {
     const newKeysMap = (0, just_clone_1.default)(foundKeysMap);
     keysArray.forEach(address => {

@@ -3,6 +3,7 @@ import { InputOptions } from '@actions/core';
 export type Args = {
   branch: string;
   onlyNotify?: boolean;
+  reportPublicKeys?: boolean;
 
   notifications?: {
     token: string;
