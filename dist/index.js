@@ -264,7 +264,7 @@ const getSummary = (passed, foundAddresses, foundPrivates, reportPublicKeys) => 
             summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
         });
     }
-    if (reportPublicKeys) {
+    if (reportPublicKeys && publicKeys.length) {
         summary += '⚠️ Possible public keys found: \n';
         publicKeys.forEach(key => {
             summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
