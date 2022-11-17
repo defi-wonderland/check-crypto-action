@@ -66,7 +66,7 @@ export const getSummary = (
     });
   }
 
-  if (reportPublicKeys) {
+  if (reportPublicKeys && publicKeys.length) {
     summary += '⚠️ Possible public keys found: \n';
     publicKeys.forEach(key => {
       summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
