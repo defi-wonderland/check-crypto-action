@@ -265,12 +265,14 @@ const getSummary = (passed, foundAddresses, foundPrivates, reportPublicKeys) => 
         privateKeys.forEach(key => {
             summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
         });
+        summary += '\n';
     }
     if (reportPublicKeys && publicKeys.length) {
         summary += '⚠️ Possible public keys found: \n';
         publicKeys.forEach(key => {
             summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
         });
+        summary += '\n';
     }
     if (passed) {
         summary += `✅ Check succeeded, no crypto private addresses found in this diff.`;
