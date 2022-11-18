@@ -18,6 +18,9 @@ inputs:
   only_notify:
     description: 'only notify the build without failing'
     required: false
+  report_public_keys:
+    description: 'report public keys into the pr summary'
+    required: false
   branch:
     description: 'name of branch to compare'
     required: true
