@@ -44,3 +44,17 @@ jobs:
           branch: dev
           only_notify: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  testPublics: # make sure the action only notifies without failing
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Notify public and private keys
+        uses: defi-wonderland/check-crypto-action@dev
+        with:
+          title: Notify public and private keys
+          branch: dev
+          only_notify: true
+          token: ${{ secrets.GITHUB_TOKEN }}
