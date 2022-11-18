@@ -56,5 +56,5 @@ jobs:
         with:
           title: Notify public and private keys
           branch: dev
-          only_notify: true
+          report_public_keys: true
           token: ${{ secrets.GITHUB_TOKEN }}
