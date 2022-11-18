@@ -93,11 +93,13 @@ function run() {
             if (inputs.notifications) {
                 core.debug(`Setting up OctoKit`);
                 const octokit = new github.GitHub(inputs.notifications.token);
+                const notifyPublicAddresses = inputs.reportPublicKeys && Object.keys(result.foundAddresses).length;
+                const notifyIssue = inputs.notifications.issue && (!result.passed || notifyPublicAddresses);
                 if (inputs.notifications.check) {
                     core.debug(`Notification: Check Run`);
                     yield (0, notifications_1.createRun)(octokit, github.context, result, summary, inputs.notifications.label);
                 }
-                if (inputs.notifications.issue && !result.passed) {
+                if (notifyIssue) {
                     core.debug(`Notification: Issue`);
                     const issueId = github.context.issue.number;
                     if (issueId || issueId === 0) {
