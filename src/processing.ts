@@ -64,6 +64,7 @@ export const getSummary = (
     privateKeys.forEach(key => {
       summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
     });
+    summary += '\n';
   }
 
   if (reportPublicKeys && publicKeys.length) {
@@ -71,6 +72,7 @@ export const getSummary = (
     publicKeys.forEach(key => {
       summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
     });
+    summary += '\n';
   }
 
   if (passed) {
