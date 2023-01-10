@@ -225,7 +225,7 @@ const child_process_1 = __nccwpck_require__(2081);
 const just_clone_1 = __importDefault(__nccwpck_require__(445));
 const fetchDiff = (branch = 'main') => {
     core.debug('Fetch branch to compare');
-    (0, child_process_1.execSync)(`git fetch origin ${branch}`);
+    (0, child_process_1.execSync)(`git fetch origin ${branch}`, { stdio: 'ignore' });
     return (0, child_process_1.execSync)(`git diff origin/${branch} HEAD`).toString();
 };
 exports.fetchDiff = fetchDiff;
