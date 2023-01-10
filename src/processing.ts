@@ -11,9 +11,12 @@ export type Result = {
 type AddressObject = { [key: string]: { files: string[] } };
 
 export const fetchDiff = (branch = 'main'): string => {
+  // NOTE We set the max node buffer to 2mb to account for large diffs
+  const MAX_BUFFER = 1000 * 1000 * 2;
+
   core.debug('Fetch branch to compare');
-  execSync(`git fetch origin ${branch}`);
-  return execSync(`git diff origin/${branch} HEAD`).toString();
+  execSync(`git fetch origin ${branch}`, { maxBuffer: MAX_BUFFER });
+  return execSync(`git diff origin/${branch} HEAD`, { maxBuffer: MAX_BUFFER }).toString();
 };
 
 export const processDiff = (diff: string): Result => {
