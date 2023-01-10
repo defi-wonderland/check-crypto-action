@@ -86,9 +86,11 @@ function run() {
         try {
             core.debug(`Parsing inputs`);
             const inputs = (0, inputs_1.parseInputs)(core.getInput);
-            core.debug(`Calculating result`);
+            core.debug(`Fetching diff`);
             const diff = (0, processing_1.fetchDiff)(inputs.branch);
+            core.debug(`Processing diff`);
             const result = (0, processing_1.processDiff)(diff);
+            core.debug(`Creating summary message`);
             const summary = (0, processing_1.getSummary)(result.passed, result.foundAddresses, result.foundPrivates, inputs.reportPublicKeys);
             if (inputs.notifications) {
                 core.debug(`Setting up OctoKit`);
@@ -224,9 +226,11 @@ const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(2081);
 const just_clone_1 = __importDefault(__nccwpck_require__(2181));
 const fetchDiff = (branch = 'main') => {
+    // NOTE We set the max node buffer to 2mb to account for large diffs
+    const MAX_BUFFER = 1000 * 1000 * 2;
     core.debug('Fetch branch to compare');
-    (0, child_process_1.execSync)(`git fetch origin ${branch}`, { stdio: 'ignore' });
-    return (0, child_process_1.execSync)(`git diff origin/${branch} HEAD`).toString();
+    (0, child_process_1.execSync)(`git fetch origin ${branch}`, { maxBuffer: MAX_BUFFER });
+    return (0, child_process_1.execSync)(`git diff origin/${branch} HEAD`, { maxBuffer: MAX_BUFFER }).toString();
 };
 exports.fetchDiff = fetchDiff;
 const processDiff = (diff) => {
