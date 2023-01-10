@@ -9,9 +9,11 @@ async function run(): Promise<void> {
     core.debug(`Parsing inputs`);
     const inputs = parseInputs(core.getInput);
 
-    core.debug(`Calculating result`);
+    core.debug(`Fetching diff`);
     const diff = fetchDiff(inputs.branch);
+    core.debug(`Processing diff`);
     const result = processDiff(diff);
+    core.debug(`Creating summary message`);
     const summary = getSummary(result.passed, result.foundAddresses, result.foundPrivates, inputs.reportPublicKeys);
 
     if (inputs.notifications) {
