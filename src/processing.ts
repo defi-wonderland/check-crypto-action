@@ -12,7 +12,7 @@ type AddressObject = { [key: string]: { files: string[] } };
 
 export const fetchDiff = (branch = 'main'): string => {
   core.debug('Fetch branch to compare');
-  execSync(`git fetch origin ${branch}`);
+  execSync(`git fetch origin ${branch}`, { stdio: 'ignore' });
   return execSync(`git diff origin/${branch} HEAD`).toString();
 };
 
