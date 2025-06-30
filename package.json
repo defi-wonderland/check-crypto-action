@@ -30,7 +30,7 @@
     "just-clone": "6.2.0"
   },
   "devDependencies": {
-    "@types/diff": "5.0.2",
+    "@types/diff": "7.0.2",
     "@types/jest": "27.5.2",
     "@types/node": "18.11.19",
     "@typescript-eslint/parser": "5.50.0",
