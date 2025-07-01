@@ -43,4 +43,5 @@ jobs:
           title: Check pk only notify
           branch: dev
           only_notify: true
+          report-public-keys: true
           token: ${{ secrets.GITHUB_TOKEN }}
