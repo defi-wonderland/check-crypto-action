@@ -32,10 +32,7 @@ export const processDiff = (diff: string): Result => {
   diff.split('\n').forEach(line => {
     // NOTE New file
     if (line.includes('diff --git a')) {
-      const fullLine = line;
       currentFile = line.split(' b/')[1];
-      core.debug(`Git diff line: "${fullLine}"`);
-      core.debug(`Extracted file path: "${currentFile}"`);
     }
     if ((line && line[0] === '-') || line[0] === '+') {
       // NOTE Regexp for public addresses
@@ -74,7 +71,9 @@ export const getSummary = (
     summary += '🚨 Possible private keys found: \n';
 
     privateKeys.forEach(key => {
-      summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+      // Wrap file paths in backticks to prevent markdown formatting issues
+      const wrappedFiles = foundPrivates[key].files.map(file => `\`${file}\``);
+      summary += `- Private key \`${key}\` in file/s ${wrappedFiles.join(', ')}  \n`;
     });
     summary += '\n';
   }
@@ -82,7 +81,9 @@ export const getSummary = (
   if (reportPublicKeys && publicKeys.length) {
     summary += '⚠️ Possible public keys found: \n';
     publicKeys.forEach(key => {
-      summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
+      // Wrap file paths in backticks to prevent markdown formatting issues
+      const wrappedFiles = foundAddresses[key].files.map(file => `\`${file}\``);
+      summary += `- Public key \`${key}\` in file/s ${wrappedFiles.join(', ')} \n`;
     });
     summary += '\n';
   }

@@ -95,7 +95,6 @@ exports.parseIgnoreFile = parseIgnoreFile;
  * Check if a potential crypto finding should be ignored
  */
 function shouldIgnore(foundString, filePath, rules) {
-    core.debug(`Checking if should ignore "${foundString}" in file "${filePath}"`);
     // Check if file is ignored by pattern
     if (isFileIgnored(filePath, rules.filePatterns)) {
         core.debug(`Ignoring ${foundString} in ${filePath} - file pattern match`);
@@ -106,7 +105,6 @@ function shouldIgnore(foundString, filePath, rules) {
         core.debug(`Ignoring ${foundString} - string specific ignore`);
         return true;
     }
-    core.debug(`NOT ignoring ${foundString} in ${filePath} - no patterns matched`);
     return false;
 }
 exports.shouldIgnore = shouldIgnore;
@@ -367,10 +365,7 @@ const processDiff = (diff) => {
     diff.split('\n').forEach(line => {
         // NOTE New file
         if (line.includes('diff --git a')) {
-            const fullLine = line;
             currentFile = line.split(' b/')[1];
-            core.debug(`Git diff line: "${fullLine}"`);
-            core.debug(`Extracted file path: "${currentFile}"`);
         }
         if ((line && line[0] === '-') || line[0] === '+') {
             // NOTE Regexp for public addresses
@@ -398,14 +393,18 @@ const getSummary = (passed, foundAddresses, foundPrivates, reportPublicKeys) => 
     if (privateKeys.length) {
         summary += '🚨 Possible private keys found: \n';
         privateKeys.forEach(key => {
-            summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+            // Wrap file paths in backticks to prevent markdown formatting issues
+            const wrappedFiles = foundPrivates[key].files.map(file => `\`${file}\``);
+            summary += `- Private key \`${key}\` in file/s ${wrappedFiles.join(', ')}  \n`;
         });
         summary += '\n';
     }
     if (reportPublicKeys && publicKeys.length) {
         summary += '⚠️ Possible public keys found: \n';
         publicKeys.forEach(key => {
-            summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
+            // Wrap file paths in backticks to prevent markdown formatting issues
+            const wrappedFiles = foundAddresses[key].files.map(file => `\`${file}\``);
+            summary += `- Public key \`${key}\` in file/s ${wrappedFiles.join(', ')} \n`;
         });
         summary += '\n';
     }
