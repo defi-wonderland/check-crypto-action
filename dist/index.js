@@ -99,13 +99,23 @@ function run() {
                 const notifyIssue = inputs.notifications.issue && (!result.passed || notifyPublicAddresses);
                 if (inputs.notifications.check) {
                     core.debug(`Notification: Check Run`);
-                    yield (0, notifications_1.createRun)(octokit, github.context, result, summary, inputs.notifications.label);
+                    try {
+                        yield (0, notifications_1.createRun)(octokit, github.context, result, summary, inputs.notifications.label);
+                    }
+                    catch (error) {
+                        core.warning(`Failed to create check run: ${error instanceof Error ? error.message : error}`);
+                    }
                 }
                 if (notifyIssue) {
                     core.debug(`Notification: Issue`);
                     const issueId = github.context.issue.number;
                     if (issueId || issueId === 0) {
-                        yield (0, notifications_1.createComment)(octokit, github.context, result, summary, inputs.notifications.label);
+                        try {
+                            yield (0, notifications_1.createComment)(octokit, github.context, result, summary, inputs.notifications.label);
+                        }
+                        catch (error) {
+                            core.warning(`Failed to create PR comment: ${error instanceof Error ? error.message : error}`);
+                        }
                     }
                     else {
                         core.debug(`Notification: no issue id`);

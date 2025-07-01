@@ -10,7 +10,7 @@ inputs:
     required: false
   notify_issue:
     description: 'send a notification to the linked issue/pullrequest with the summary'
-    default: true
+    default: 'true'
     required: false
   notify_check:
     description: 'create a check run with the summary'
