@@ -38,11 +38,26 @@ export const processDiff = (diff: string): Result => {
       // NOTE Regexp for public addresses
       const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
       const filteredPublicKeys = publicKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+
+      // Log helpful info for found public keys (if any)
+      if (filteredPublicKeys.length > 0) {
+        filteredPublicKeys.forEach(key => {
+          core.debug(`Found potential public key: ${key} in ${currentFile}`);
+        });
+      }
+
       foundAddresses = getNewKeysMap(filteredPublicKeys, foundAddresses, currentFile);
 
       // NOTE Regexp for private addresses
       const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
       const filteredPrivateKeys = privateKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+
+      // Log helpful info for found keys
+      filteredPrivateKeys.forEach(key => {
+        core.info(`Found potential private key: ${key} in ${currentFile}`);
+        core.info(`💡 False positive? Add to .checkcryptoignore: ${key} or ${currentFile}`);
+      });
+
       foundPrivates = getNewKeysMap(filteredPrivateKeys, foundPrivates, currentFile);
     }
   });
@@ -76,6 +91,18 @@ export const getSummary = (
       summary += `- Private key \`${key}\` in file/s ${wrappedFiles.join(', ')}  \n`;
     });
     summary += '\n';
+    summary += '💡 **False positive?** Add the key or file pattern to `.checkcryptoignore` in your repo root:\n';
+    summary += '```\n';
+    summary += '# Ignore specific keys\n';
+    privateKeys.forEach(key => {
+      summary += `${key}\n`;
+    });
+    summary += '\n# Or ignore files/patterns\n';
+    const allFiles = [...new Set(privateKeys.flatMap(key => foundPrivates[key].files))];
+    allFiles.forEach(file => {
+      summary += `${file}\n`;
+    });
+    summary += '```\n\n';
   }
 
   if (reportPublicKeys && publicKeys.length) {
@@ -86,6 +113,18 @@ export const getSummary = (
       summary += `- Public key \`${key}\` in file/s ${wrappedFiles.join(', ')} \n`;
     });
     summary += '\n';
+    summary += '💡 **False positive?** Add the key or file pattern to `.checkcryptoignore` in your repo root:\n';
+    summary += '```\n';
+    summary += '# Ignore specific keys\n';
+    publicKeys.forEach(key => {
+      summary += `${key}\n`;
+    });
+    summary += '\n# Or ignore files/patterns\n';
+    const allPublicFiles = [...new Set(publicKeys.flatMap(key => foundAddresses[key].files))];
+    allPublicFiles.forEach(file => {
+      summary += `${file}\n`;
+    });
+    summary += '```\n\n';
   }
 
   if (passed) {
