@@ -25,16 +25,23 @@ In order to send issue notifications on Github, you must supply the `token` inpu
 
 You can create a `.checkcryptoignore` file in your repository root to ignore false positives. This file supports:
 
-### File Patterns (glob syntax)
+### Directory Patterns
 
 ```
-# Ignore all test files
-**/*test*.ts
-**/*test*.js
+# Ignore entire directories (use trailing slash)
+tests/
+__tests__/
+docs/
+fixtures/
+```
 
-# Ignore specific directories
-**/fixtures/**
-docs/**
+### File Patterns
+
+```
+# Ignore specific files (matches anywhere in project)
+README.md
+package-lock.json
+.env
 ```
 
 ### Specific Hex Strings
@@ -47,12 +54,12 @@ docs/**
 **Example `.checkcryptoignore` file:**
 
 ```
-# Test files
-**/*test*.ts
-**/__tests__/**
+# Test directories
+tests/
+__tests__/
 
 # Documentation
-docs/**
+docs/
 README.md
 
 # Known false positives

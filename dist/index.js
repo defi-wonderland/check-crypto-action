@@ -36,23 +36,21 @@ const path = __importStar(__nccwpck_require__(1017));
 const core = __importStar(__nccwpck_require__(2186));
 const IGNORE_FILE_NAME = '.checkcryptoignore';
 /**
- * Convert a glob pattern to a regex
- */
-function globToRegex(pattern) {
-    const regexPattern = pattern
-        .replace(/\*\*/g, '§DOUBLESTAR§') // Temporary placeholder
-        .replace(/\*/g, '[^/]*') // Single * matches anything except /
-        .replace(/§DOUBLESTAR§/g, '.*') // ** matches anything including /
-        .replace(/\?/g, '[^/]'); // ? matches single character except /
-    return new RegExp(`^${regexPattern}$`);
-}
-/**
  * Check if a file path matches any ignore pattern
  */
 function isFileIgnored(filePath, patterns) {
     return patterns.some(pattern => {
-        const regex = globToRegex(pattern);
-        return regex.test(filePath);
+        let matches = false;
+        if (pattern.endsWith('/')) {
+            // Directory pattern: matches if file is inside this directory
+            const dirPattern = pattern.slice(0, -1); // Remove trailing /
+            matches = filePath.startsWith(dirPattern + '/');
+        }
+        else {
+            // Exact file match
+            matches = filePath === pattern || filePath.endsWith('/' + pattern);
+        }
+        return matches;
     });
 }
 /**

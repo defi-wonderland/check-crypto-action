@@ -10,25 +10,22 @@ export interface IgnoreRules {
 const IGNORE_FILE_NAME = '.checkcryptoignore';
 
 /**
- * Convert a glob pattern to a regex
- */
-function globToRegex(pattern: string): RegExp {
-  const regexPattern = pattern
-    .replace(/\*\*/g, '§DOUBLESTAR§') // Temporary placeholder
-    .replace(/\*/g, '[^/]*') // Single * matches anything except /
-    .replace(/§DOUBLESTAR§/g, '.*') // ** matches anything including /
-    .replace(/\?/g, '[^/]'); // ? matches single character except /
-
-  return new RegExp(`^${regexPattern}$`);
-}
-
-/**
  * Check if a file path matches any ignore pattern
  */
 function isFileIgnored(filePath: string, patterns: string[]): boolean {
   return patterns.some(pattern => {
-    const regex = globToRegex(pattern);
-    return regex.test(filePath);
+    let matches = false;
+
+    if (pattern.endsWith('/')) {
+      // Directory pattern: matches if file is inside this directory
+      const dirPattern = pattern.slice(0, -1); // Remove trailing /
+      matches = filePath.startsWith(dirPattern + '/');
+    } else {
+      // Exact file match
+      matches = filePath === pattern || filePath.endsWith('/' + pattern);
+    }
+
+    return matches;
   });
 }
 

@@ -4,16 +4,21 @@
 # Lines starting with # are comments and will be ignored.
 # Empty lines are also ignored.
 
-# ===== FILE PATTERNS =====
-# Ignore entire files or directories using glob patterns
+# ===== DIRECTORY PATTERNS =====
+# Ignore entire directories (use trailing slash)
 # Examples:
-**/*test*.ts              # Ignore all test files
-**/*test*.js              # Ignore all test files  
-**/*mock*.ts              # Ignore all mock files
-**/fixtures/**            # Ignore fixtures directory
-**/examples/**            # Ignore examples directory
-docs/**                   # Ignore documentation
-README.md                 # Ignore specific file
+tests/                    # Ignore tests directory and all contents
+__tests__/                # Ignore __tests__ directory and all contents
+fixtures/                 # Ignore fixtures directory
+examples/                 # Ignore examples directory
+docs/                     # Ignore documentation directory
+
+# ===== FILE PATTERNS =====
+# Ignore specific files (matches anywhere in project)
+# Examples:
+README.md                 # Ignore any README.md file
+package-lock.json         # Ignore package lock files
+.env                      # Ignore environment files
 
 # ===== SPECIFIC HEX STRINGS =====
 # Ignore specific 64-character hex strings that are not private keys
@@ -27,19 +32,19 @@ README.md                 # Ignore specific file
 # Here are some common patterns you might want to ignore:
 
 # Test directories
-**/__tests__/**
-**/__mocks__/**
-**/test/**
-**/tests/**
+tests/
+__tests__/
+__mocks__/
+test/
 
 # Build outputs  
-**/dist/**
-**/build/**
-**/out/**
+dist/
+build/
+out/
 
 # Dependencies
-**/node_modules/**
+node_modules/
 
 # Documentation
-**/docs/**
-**/*.md 
+docs/
+README.md 

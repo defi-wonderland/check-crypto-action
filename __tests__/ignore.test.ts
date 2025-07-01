@@ -57,7 +57,7 @@ ${testHash}
   });
 
   test('should ignore files by pattern', () => {
-    const ignoreContent = `**/*test*.ts`;
+    const ignoreContent = `utils.test.ts`;
     fs.writeFileSync(ignoreFilePath, ignoreContent);
     const rules = parseIgnoreFile(testDir);
 
