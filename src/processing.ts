@@ -32,7 +32,10 @@ export const processDiff = (diff: string): Result => {
   diff.split('\n').forEach(line => {
     // NOTE New file
     if (line.includes('diff --git a')) {
+      const fullLine = line;
       currentFile = line.split(' b/')[1];
+      core.debug(`Git diff line: "${fullLine}"`);
+      core.debug(`Extracted file path: "${currentFile}"`);
     }
     if ((line && line[0] === '-') || line[0] === '+') {
       // NOTE Regexp for public addresses

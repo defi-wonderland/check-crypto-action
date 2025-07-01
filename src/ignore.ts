@@ -81,6 +81,8 @@ export function parseIgnoreFile(workingDirectory: string = process.cwd()): Ignor
  * Check if a potential crypto finding should be ignored
  */
 export function shouldIgnore(foundString: string, filePath: string, rules: IgnoreRules): boolean {
+  core.debug(`Checking if should ignore "${foundString}" in file "${filePath}"`);
+
   // Check if file is ignored by pattern
   if (isFileIgnored(filePath, rules.filePatterns)) {
     core.debug(`Ignoring ${foundString} in ${filePath} - file pattern match`);
@@ -93,5 +95,6 @@ export function shouldIgnore(foundString: string, filePath: string, rules: Ignor
     return true;
   }
 
+  core.debug(`NOT ignoring ${foundString} in ${filePath} - no patterns matched`);
   return false;
 }
