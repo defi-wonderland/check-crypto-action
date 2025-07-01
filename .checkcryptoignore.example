@@ -1,0 +1,50 @@
+# .checkcryptoignore
+# 
+# This file allows you to ignore false positives in crypto key detection.
+# Lines starting with # are comments and will be ignored.
+# Empty lines are also ignored.
+
+# ===== DIRECTORY PATTERNS =====
+# Ignore entire directories (use trailing slash)
+# Examples:
+tests/                    # Ignore tests directory and all contents
+__tests__/                # Ignore __tests__ directory and all contents
+fixtures/                 # Ignore fixtures directory
+examples/                 # Ignore examples directory
+docs/                     # Ignore documentation directory
+
+# ===== FILE PATTERNS =====
+# Ignore specific files (matches anywhere in project)
+# Examples:
+README.md                 # Ignore any README.md file
+package-lock.json         # Ignore package lock files
+.env                      # Ignore environment files
+
+# ===== SPECIFIC HEX STRINGS =====
+# Ignore specific 64-character hex strings that are not private keys
+# Each line should contain exactly 64 hex characters
+# Examples:
+1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  # Example hash used in docs
+0000000000000000000000000000000000000000000000000000000000000000  # Null hash
+
+
+# ===== COMMON PATTERNS TO IGNORE =====
+# Here are some common patterns you might want to ignore:
+
+# Test directories
+tests/
+__tests__/
+__mocks__/
+test/
+
+# Build outputs  
+dist/
+build/
+out/
+
+# Dependencies
+node_modules/
+
+# Documentation
+docs/
+README.md 

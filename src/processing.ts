@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
 import clone from 'just-clone';
+import { parseIgnoreFile, shouldIgnore, IgnoreRules } from './ignore';
 
 export type Result = {
   passed: boolean;
@@ -20,6 +21,9 @@ export const fetchDiff = (branch = 'main'): string => {
 };
 
 export const processDiff = (diff: string): Result => {
+  // Load ignore rules
+  const ignoreRules = parseIgnoreFile();
+
   let currentFile = '';
   let foundAddresses: AddressObject = {};
   let foundPrivates: AddressObject = {};
@@ -33,11 +37,13 @@ export const processDiff = (diff: string): Result => {
     if ((line && line[0] === '-') || line[0] === '+') {
       // NOTE Regexp for public addresses
       const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
-      foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
+      const filteredPublicKeys = publicKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+      foundAddresses = getNewKeysMap(filteredPublicKeys, foundAddresses, currentFile);
 
       // NOTE Regexp for private addresses
       const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-      foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
+      const filteredPrivateKeys = privateKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+      foundPrivates = getNewKeysMap(filteredPrivateKeys, foundPrivates, currentFile);
     }
   });
 
@@ -65,7 +71,9 @@ export const getSummary = (
     summary += '🚨 Possible private keys found: \n';
 
     privateKeys.forEach(key => {
-      summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+      // Wrap file paths in backticks to prevent markdown formatting issues
+      const wrappedFiles = foundPrivates[key].files.map(file => `\`${file}\``);
+      summary += `- Private key \`${key}\` in file/s ${wrappedFiles.join(', ')}  \n`;
     });
     summary += '\n';
   }
@@ -73,7 +81,9 @@ export const getSummary = (
   if (reportPublicKeys && publicKeys.length) {
     summary += '⚠️ Possible public keys found: \n';
     publicKeys.forEach(key => {
-      summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
+      // Wrap file paths in backticks to prevent markdown formatting issues
+      const wrappedFiles = foundAddresses[key].files.map(file => `\`${file}\``);
+      summary += `- Public key \`${key}\` in file/s ${wrappedFiles.join(', ')} \n`;
     });
     summary += '\n';
   }
