@@ -42,7 +42,6 @@ docs/**
 ```
 # Ignore specific 64-character hex strings that are not private keys
 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
-abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef
 ```
 
 **Example `.checkcryptoignore` file:**
