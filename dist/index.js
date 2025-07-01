@@ -1,6 +1,119 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 5404:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.shouldIgnore = exports.parseIgnoreFile = void 0;
+const fs = __importStar(__nccwpck_require__(7147));
+const path = __importStar(__nccwpck_require__(1017));
+const core = __importStar(__nccwpck_require__(2186));
+const IGNORE_FILE_NAME = '.checkcryptoignore';
+/**
+ * Convert a glob pattern to a regex
+ */
+function globToRegex(pattern) {
+    const regexPattern = pattern
+        .replace(/\*\*/g, '§DOUBLESTAR§') // Temporary placeholder
+        .replace(/\*/g, '[^/]*') // Single * matches anything except /
+        .replace(/§DOUBLESTAR§/g, '.*') // ** matches anything including /
+        .replace(/\?/g, '[^/]'); // ? matches single character except /
+    return new RegExp(`^${regexPattern}$`);
+}
+/**
+ * Check if a file path matches any ignore pattern
+ */
+function isFileIgnored(filePath, patterns) {
+    return patterns.some(pattern => {
+        const regex = globToRegex(pattern);
+        return regex.test(filePath);
+    });
+}
+/**
+ * Parse the ignore file and return structured rules
+ */
+function parseIgnoreFile(workingDirectory = process.cwd()) {
+    const ignoreFilePath = path.join(workingDirectory, IGNORE_FILE_NAME);
+    const rules = {
+        filePatterns: [],
+        stringIgnores: new Set(),
+    };
+    if (!fs.existsSync(ignoreFilePath)) {
+        core.debug(`No ignore file found at ${ignoreFilePath}`);
+        return rules;
+    }
+    try {
+        const content = fs.readFileSync(ignoreFilePath, 'utf8');
+        const lines = content.split('\n');
+        for (const line of lines) {
+            const trimmed = line.trim();
+            // Skip empty lines and comments
+            if (!trimmed || trimmed.startsWith('#')) {
+                continue;
+            }
+            // Check for hex string (64 characters of hex)
+            if (/^[0-9a-fA-F]{64}$/.test(trimmed)) {
+                rules.stringIgnores.add(trimmed.toLowerCase());
+                continue;
+            }
+            // Otherwise, treat as file pattern
+            rules.filePatterns.push(trimmed);
+        }
+        core.debug(`Loaded ignore rules: ${rules.filePatterns.length} file patterns, ${rules.stringIgnores.size} string ignores`);
+    }
+    catch (error) {
+        core.warning(`Failed to read ignore file: ${error instanceof Error ? error.message : error}`);
+    }
+    return rules;
+}
+exports.parseIgnoreFile = parseIgnoreFile;
+/**
+ * Check if a potential crypto finding should be ignored
+ */
+function shouldIgnore(foundString, filePath, rules) {
+    // Check if file is ignored by pattern
+    if (isFileIgnored(filePath, rules.filePatterns)) {
+        core.debug(`Ignoring ${foundString} in ${filePath} - file pattern match`);
+        return true;
+    }
+    // Check if specific string is ignored
+    if (rules.stringIgnores.has(foundString.toLowerCase())) {
+        core.debug(`Ignoring ${foundString} - string specific ignore`);
+        return true;
+    }
+    return false;
+}
+exports.shouldIgnore = shouldIgnore;
+
+
+/***/ }),
+
 /***/ 6180:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -235,6 +348,7 @@ exports.getSummary = exports.processDiff = exports.fetchDiff = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const child_process_1 = __nccwpck_require__(2081);
 const just_clone_1 = __importDefault(__nccwpck_require__(2181));
+const ignore_1 = __nccwpck_require__(5404);
 const fetchDiff = (branch = 'main') => {
     // NOTE We set the max node buffer to +-50mb to account for large diffs
     const MAX_BUFFER = 1000 * 1000 * 50;
@@ -244,6 +358,8 @@ const fetchDiff = (branch = 'main') => {
 };
 exports.fetchDiff = fetchDiff;
 const processDiff = (diff) => {
+    // Load ignore rules
+    const ignoreRules = (0, ignore_1.parseIgnoreFile)();
     let currentFile = '';
     let foundAddresses = {};
     let foundPrivates = {};
@@ -256,10 +372,12 @@ const processDiff = (diff) => {
         if ((line && line[0] === '-') || line[0] === '+') {
             // NOTE Regexp for public addresses
             const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
-            foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
+            const filteredPublicKeys = publicKeysFound.filter(key => !(0, ignore_1.shouldIgnore)(key, currentFile, ignoreRules));
+            foundAddresses = getNewKeysMap(filteredPublicKeys, foundAddresses, currentFile);
             // NOTE Regexp for private addresses
             const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-            foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
+            const filteredPrivateKeys = privateKeysFound.filter(key => !(0, ignore_1.shouldIgnore)(key, currentFile, ignoreRules));
+            foundPrivates = getNewKeysMap(filteredPrivateKeys, foundPrivates, currentFile);
         }
     });
     const passed = Object.keys(foundPrivates).length == 0;

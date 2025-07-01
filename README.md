@@ -21,6 +21,45 @@ This action checks for crypto private keys in the diff code for the current comm
 **Note:**
 In order to send issue notifications on Github, you must supply the `token` input
 
+## Ignoring False Positives
+
+You can create a `.checkcryptoignore` file in your repository root to ignore false positives. This file supports:
+
+### File Patterns (glob syntax)
+
+```
+# Ignore all test files
+**/*test*.ts
+**/*test*.js
+
+# Ignore specific directories
+**/fixtures/**
+docs/**
+```
+
+### Specific Hex Strings
+
+```
+# Ignore specific 64-character hex strings that are not private keys
+1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef
+```
+
+**Example `.checkcryptoignore` file:**
+
+```
+# Test files
+**/*test*.ts
+**/__tests__/**
+
+# Documentation
+docs/**
+README.md
+
+# Known false positives
+1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+```
+
 ## Action Outputs
 
 | Output | Description                                  |

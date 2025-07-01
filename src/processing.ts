@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
 import clone from 'just-clone';
+import { parseIgnoreFile, shouldIgnore, IgnoreRules } from './ignore';
 
 export type Result = {
   passed: boolean;
@@ -20,6 +21,9 @@ export const fetchDiff = (branch = 'main'): string => {
 };
 
 export const processDiff = (diff: string): Result => {
+  // Load ignore rules
+  const ignoreRules = parseIgnoreFile();
+
   let currentFile = '';
   let foundAddresses: AddressObject = {};
   let foundPrivates: AddressObject = {};
@@ -33,11 +37,13 @@ export const processDiff = (diff: string): Result => {
     if ((line && line[0] === '-') || line[0] === '+') {
       // NOTE Regexp for public addresses
       const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
-      foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
+      const filteredPublicKeys = publicKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+      foundAddresses = getNewKeysMap(filteredPublicKeys, foundAddresses, currentFile);
 
       // NOTE Regexp for private addresses
       const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-      foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
+      const filteredPrivateKeys = privateKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+      foundPrivates = getNewKeysMap(filteredPrivateKeys, foundPrivates, currentFile);
     }
   });
 
