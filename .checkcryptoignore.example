@@ -20,9 +20,7 @@ README.md                 # Ignore specific file
 # Each line should contain exactly 64 hex characters
 # Examples:
 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  # Example hash used in docs
-abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef  # Mock transaction ID
 0000000000000000000000000000000000000000000000000000000000000000  # Null hash
-
 
 
 # ===== COMMON PATTERNS TO IGNORE =====
