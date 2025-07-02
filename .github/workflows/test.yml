@@ -6,9 +6,15 @@ on: # rebuild any PRs and main branch changes
       - main
       - 'releases/*'
 
+# Default permissions for all jobs (can be overridden per job)
+permissions:
+  contents: read
+
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +26,11 @@ jobs:
 
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +46,11 @@ jobs:
 
   testOnlyNotify: # make sure the action only notifies without failing
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      checks: write
 
     steps:
       - uses: actions/checkout@v4

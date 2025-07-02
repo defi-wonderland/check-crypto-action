@@ -132,6 +132,9 @@ export const getSummary = (
       summary += `${file}\n`;
     });
 
+    summary += '\n# Or ignore directories (use trailing slash)\n';
+    summary += 'tests/\n';
+
     summary += '```\n\n';
   }
 
