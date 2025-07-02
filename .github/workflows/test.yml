@@ -30,6 +30,7 @@ jobs:
           branch: dev
           notify_issue: false
           notify_check: true
+          report-public-keys: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   testOnlyNotify: # make sure the action only notifies without failing
