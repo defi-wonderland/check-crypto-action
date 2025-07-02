@@ -5,7 +5,6 @@ author: 'Wonderland'
 #   contents: read (always required - to read repository code and git diffs)
 #   checks: write (optional - only if notify_check: true)
 #   pull-requests: write (optional - only if notify_issue: true on PRs)
-#   issues: write (optional - only if notify_issue: true on issues)
 inputs:
   token:
     description: 'your GITHUB_TOKEN, used when sending the notification'

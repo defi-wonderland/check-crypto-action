@@ -33,7 +33,6 @@ The action requires the following permissions (use all of them for simplicity):
 
 - `checks: write` - Only if `notify_check: true` (creates check runs)
 - `pull-requests: write` - Only if `notify_issue: true` on pull requests
-- `issues: write` - Only if `notify_issue: true` on issues
 
 ### Example with explicit permissions:
 
@@ -43,7 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
       pull-requests: write
       checks: write
     steps:
@@ -118,7 +116,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
       pull-requests: write
       checks: write
     steps:
@@ -140,7 +137,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
       pull-requests: write
       checks: write
     steps:
@@ -163,7 +159,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
       pull-requests: write
       checks: write
     steps:
