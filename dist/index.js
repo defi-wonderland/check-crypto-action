@@ -444,6 +444,8 @@ const getSummary = (passed, foundAddresses, foundPrivates, reportPublicKeys) => 
         allFiles.forEach(file => {
             summary += `${file}\n`;
         });
+        summary += '\n# Or ignore directories (use trailing slash)\n';
+        summary += 'tests/\n';
         summary += '```\n\n';
     }
     if (passed) {
