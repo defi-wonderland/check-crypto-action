@@ -91,18 +91,6 @@ export const getSummary = (
       summary += `- Private key \`${key}\` in file/s ${wrappedFiles.join(', ')}  \n`;
     });
     summary += '\n';
-    summary += '💡 **False positive?** Add the key or file pattern to `.checkcryptoignore` in your repo root:\n';
-    summary += '```\n';
-    summary += '# Ignore specific keys\n';
-    privateKeys.forEach(key => {
-      summary += `${key}\n`;
-    });
-    summary += '\n# Or ignore files/patterns\n';
-    const allFiles = [...new Set(privateKeys.flatMap(key => foundPrivates[key].files))];
-    allFiles.forEach(file => {
-      summary += `${file}\n`;
-    });
-    summary += '```\n\n';
   }
 
   if (reportPublicKeys && publicKeys.length) {
@@ -113,17 +101,37 @@ export const getSummary = (
       summary += `- Public key \`${key}\` in file/s ${wrappedFiles.join(', ')} \n`;
     });
     summary += '\n';
+  }
+
+  // Add comprehensive false positive guidance if any keys were found
+  if (privateKeys.length || (reportPublicKeys && publicKeys.length)) {
     summary += '💡 **False positive?** Add the key or file pattern to `.checkcryptoignore` in your repo root:\n';
     summary += '```\n';
     summary += '# Ignore specific keys\n';
-    publicKeys.forEach(key => {
+
+    // Add all found keys
+    privateKeys.forEach(key => {
       summary += `${key}\n`;
     });
+    if (reportPublicKeys) {
+      publicKeys.forEach(key => {
+        summary += `${key}\n`;
+      });
+    }
+
     summary += '\n# Or ignore files/patterns\n';
-    const allPublicFiles = [...new Set(publicKeys.flatMap(key => foundAddresses[key].files))];
-    allPublicFiles.forEach(file => {
+
+    // Add all unique file paths
+    const allFiles = [
+      ...new Set([
+        ...privateKeys.flatMap(key => foundPrivates[key].files),
+        ...(reportPublicKeys ? publicKeys.flatMap(key => foundAddresses[key].files) : []),
+      ]),
+    ];
+    allFiles.forEach(file => {
       summary += `${file}\n`;
     });
+
     summary += '```\n\n';
   }
 
