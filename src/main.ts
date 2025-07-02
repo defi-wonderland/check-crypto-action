@@ -4,6 +4,11 @@ import { parseInputs } from './inputs';
 import { fetchDiff, processDiff, getSummary } from './processing';
 import { createRun, createComment } from './notifications';
 
+/**
+ * Executes the main GitHub Action workflow, handling input parsing, diff processing, summary generation, notifications, and output setting.
+ *
+ * Orchestrates the end-to-end process for the action, including conditional notifications via check runs or issue comments, and marks the workflow as failed if required.
+ */
 async function run(): Promise<void> {
   try {
     core.debug(`Parsing inputs`);
