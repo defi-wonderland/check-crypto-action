@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "private": true,
   "description": "An action to check for crypto private keys in pushed code",
-  "main": "lib/main.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
