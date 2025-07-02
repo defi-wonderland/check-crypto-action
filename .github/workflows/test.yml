@@ -30,7 +30,7 @@ jobs:
           branch: dev
           notify_issue: false
           notify_check: true
-          report-public-keys: true
+          report_public_keys: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   testOnlyNotify: # make sure the action only notifies without failing
@@ -44,5 +44,5 @@ jobs:
           title: Check pk only notify
           branch: dev
           only_notify: true
-          report-public-keys: true
+          report_public_keys: true
           token: ${{ secrets.GITHUB_TOKEN }}
