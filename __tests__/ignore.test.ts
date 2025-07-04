@@ -21,7 +21,7 @@ describe('Ignore functionality tests', () => {
     }
   });
 
-  test('should parse empty ignore file', () => {
+  test('parses empty ignore file returning no rules', () => {
     fs.writeFileSync(ignoreFilePath, '');
     const rules = parseIgnoreFile(testDir);
 
@@ -29,7 +29,7 @@ describe('Ignore functionality tests', () => {
     expect(rules.stringIgnores.size).toBe(0);
   });
 
-  test('should parse file patterns', () => {
+  test('parses file patterns from ignore content', () => {
     const ignoreContent = `
 # Test files
 **/*test*.ts
@@ -44,7 +44,7 @@ docs/**
     expect(rules.filePatterns).toContain('docs/**');
   });
 
-  test('should parse string ignores', () => {
+  test('parses 64-character hex strings as string ignores', () => {
     const testHash = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
     const ignoreContent = `
 # Known false positives
@@ -56,7 +56,7 @@ ${testHash}
     expect(rules.stringIgnores.has(testHash.toLowerCase())).toBe(true);
   });
 
-  test('should ignore files by pattern', () => {
+  test('ignores files matching configured patterns', () => {
     const ignoreContent = `utils.test.ts`;
     fs.writeFileSync(ignoreFilePath, ignoreContent);
     const rules = parseIgnoreFile(testDir);
@@ -68,7 +68,7 @@ ${testHash}
     expect(shouldIgnoreNormal).toBe(false);
   });
 
-  test('should ignore specific strings', () => {
+  test('ignores specific hex strings from ignore list', () => {
     const testHash = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
     const ignoreContent = testHash;
     fs.writeFileSync(ignoreFilePath, ignoreContent);
@@ -81,14 +81,14 @@ ${testHash}
     expect(shouldIgnoreOther).toBe(false);
   });
 
-  test('should handle non-existent ignore file', () => {
+  test('returns empty rules when ignore file does not exist', () => {
     const rules = parseIgnoreFile(testDir);
 
     expect(rules.filePatterns).toHaveLength(0);
     expect(rules.stringIgnores.size).toBe(0);
   });
 
-  test('should ignore comments and empty lines', () => {
+  test('skips comments and empty lines when parsing ignore file', () => {
     const ignoreContent = `
 # This is a comment
     # This is also a comment
@@ -106,7 +106,7 @@ ${testHash}
     expect(rules.stringIgnores.size).toBe(1);
   });
 
-  test('should handle multiple file patterns', () => {
+  test('parses multiple file patterns correctly', () => {
     const ignoreContent = `
 **/*test*.ts
 **/*spec*.js
