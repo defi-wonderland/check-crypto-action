@@ -124,4 +124,29 @@ README.md
     expect(rules.filePatterns).toContain('docs/**');
     expect(rules.filePatterns).toContain('README.md');
   });
+
+  test('supports complex glob patterns with wildcards and directory matching', () => {
+    const ignoreContent = `
+**/*test*.ts
+**/fixtures/**
+docs/**
+*.log
+src/**/temp/**
+`;
+    fs.writeFileSync(ignoreFilePath, ignoreContent);
+    const rules = parseIgnoreFile(testDir);
+
+    // Test various glob patterns
+    expect(shouldIgnore('hash', 'src/utils.test.ts', rules)).toBe(true); // **/*test*.ts
+    expect(shouldIgnore('hash', 'deep/nested/file.test.ts', rules)).toBe(true); // **/*test*.ts
+    expect(shouldIgnore('hash', 'src/fixtures/data.json', rules)).toBe(true); // **/fixtures/**
+    expect(shouldIgnore('hash', 'docs/readme.md', rules)).toBe(true); // docs/**
+    expect(shouldIgnore('hash', 'debug.log', rules)).toBe(true); // *.log
+    expect(shouldIgnore('hash', 'src/utils/temp/file.txt', rules)).toBe(true); // src/**/temp/**
+
+    // Test files that should NOT be ignored
+    expect(shouldIgnore('hash', 'src/utils.ts', rules)).toBe(false); // No pattern matches
+    expect(shouldIgnore('hash', 'src/component.jsx', rules)).toBe(false); // No pattern matches
+    expect(shouldIgnore('hash', 'other/readme.md', rules)).toBe(false); // docs/** doesn't match
+  });
 });

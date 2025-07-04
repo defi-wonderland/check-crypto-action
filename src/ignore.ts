@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as core from '@actions/core';
+import { minimatch } from 'minimatch';
 
 export interface IgnoreRules {
   filePatterns: string[];
@@ -12,24 +13,24 @@ const IGNORE_FILE_NAME = '.checkcryptoignore';
 /**
  * Determines whether a file path matches any of the provided ignore patterns.
  *
- * Patterns ending with '/' are treated as directory patterns and match any file within that directory. Other patterns match exact file names or files within subdirectories.
+ * Uses glob pattern matching to support wildcards, directory patterns, and more complex matching rules.
+ * Supports standard glob patterns including wildcards and directory matching.
  *
- * @param filePath - The path of the file to check
- * @param patterns - An array of ignore patterns to match against
+ * @param filePath - The path of the file to check (normalized with forward slashes)
+ * @param patterns - An array of glob patterns to match against
  * @returns `true` if the file path matches any pattern; otherwise, `false`
  */
 function isFileIgnored(filePath: string, patterns: string[]): boolean {
-  return patterns.some(pattern => {
-    let matches = false;
+  // Normalize file path to use forward slashes for consistent matching
+  const normalizedPath = filePath.replace(/\\/g, '/');
 
-    if (pattern.endsWith('/')) {
-      // Directory pattern: matches if file is inside this directory
-      const dirPattern = pattern.slice(0, -1); // Remove trailing /
-      matches = filePath.startsWith(dirPattern + '/');
-    } else {
-      // Exact file match
-      matches = filePath === pattern || filePath.endsWith('/' + pattern);
-    }
+  return patterns.some(pattern => {
+    // Use minimatch for proper glob pattern matching
+    const matches = minimatch(normalizedPath, pattern, {
+      dot: true, // Match dotfiles
+      matchBase: true, // Match basename when pattern has no slashes
+      nocase: false, // Case sensitive matching
+    });
 
     return matches;
   });
