@@ -5,9 +5,9 @@ import { fetchDiff, processDiff, getSummary } from './processing';
 import { createRun, createComment } from './notifications';
 
 /**
- * Executes the main GitHub Action workflow, handling input parsing, diff processing, summary generation, notifications, and output setting.
+ * Runs the main workflow for the GitHub Action, including input parsing, diff analysis, summary generation, conditional notifications, and output setting.
  *
- * Orchestrates the end-to-end process for the action, including conditional notifications via check runs or issue comments, and marks the workflow as failed if required.
+ * Handles notification delivery via check runs or issue comments when enabled, and marks the workflow as failed if the analysis does not pass and notification-only mode is not set.
  */
 async function run(): Promise<void> {
   try {

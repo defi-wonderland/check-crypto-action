@@ -10,13 +10,13 @@ export interface IgnoreRules {
 const IGNORE_FILE_NAME = '.checkcryptoignore';
 
 /**
- * Determines whether a file path matches any of the provided ignore patterns.
+ * Checks if a file path matches any of the specified ignore patterns.
  *
- * Patterns ending with '/' are treated as directory patterns and match any file within that directory. Other patterns match exact file names or files within subdirectories.
+ * Directory patterns (ending with '/') match any file within that directory. Other patterns match either the exact file name or files within subdirectories.
  *
- * @param filePath - The path of the file to check
- * @param patterns - An array of ignore patterns to match against
- * @returns `true` if the file path matches any pattern; otherwise, `false`
+ * @param filePath - The file path to evaluate
+ * @param patterns - The list of ignore patterns to check against
+ * @returns `true` if the file path matches any ignore pattern; otherwise, `false`
  */
 function isFileIgnored(filePath: string, patterns: string[]): boolean {
   return patterns.some(pattern => {
@@ -36,12 +36,12 @@ function isFileIgnored(filePath: string, patterns: string[]): boolean {
 }
 
 /**
- * Parses the `.checkcryptoignore` file in the specified directory and returns ignore rules for files and strings.
+ * Loads ignore rules from a `.checkcryptoignore` file in the specified directory.
  *
- * Ignores empty lines and comments. Lines matching a 64-character hexadecimal string are treated as string ignores; all other lines are treated as file or directory patterns.
+ * Parses the file to extract file and directory patterns as well as 64-character hexadecimal strings to ignore. Ignores empty lines and comments. Returns an `IgnoreRules` object with the parsed patterns and string ignores.
  *
- * @param workingDirectory - The directory to search for the `.checkcryptoignore` file. Defaults to the current working directory.
- * @returns An `IgnoreRules` object containing file patterns and string ignores.
+ * @param workingDirectory - Directory to search for the `.checkcryptoignore` file. Defaults to the current working directory.
+ * @returns An object containing file patterns and string ignores.
  */
 export function parseIgnoreFile(workingDirectory: string = process.cwd()): IgnoreRules {
   const ignoreFilePath = path.join(workingDirectory, IGNORE_FILE_NAME);
@@ -89,9 +89,9 @@ export function parseIgnoreFile(workingDirectory: string = process.cwd()): Ignor
 }
 
 /**
- * Determines whether a found string in a file should be ignored based on provided ignore rules.
+ * Checks if a detected string in a file should be ignored according to the specified ignore rules.
  *
- * Returns `true` if the file path matches any ignore pattern or if the found string is listed in the set of ignored strings; otherwise, returns `false`.
+ * Returns `true` if the file path matches any ignore pattern or if the string is explicitly listed to be ignored; otherwise, returns `false`.
  *
  * @param foundString - The string detected in the file to check for ignoring
  * @param filePath - The path of the file where the string was found
