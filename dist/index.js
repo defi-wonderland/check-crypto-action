@@ -36,7 +36,13 @@ const path = __importStar(__nccwpck_require__(1017));
 const core = __importStar(__nccwpck_require__(2186));
 const IGNORE_FILE_NAME = '.checkcryptoignore';
 /**
- * Check if a file path matches any ignore pattern
+ * Determines whether a file path matches any of the provided ignore patterns.
+ *
+ * Patterns ending with '/' are treated as directory patterns and match any file within that directory. Other patterns match exact file names or files within subdirectories.
+ *
+ * @param filePath - The path of the file to check
+ * @param patterns - An array of ignore patterns to match against
+ * @returns `true` if the file path matches any pattern; otherwise, `false`
  */
 function isFileIgnored(filePath, patterns) {
     return patterns.some(pattern => {
@@ -54,7 +60,12 @@ function isFileIgnored(filePath, patterns) {
     });
 }
 /**
- * Parse the ignore file and return structured rules
+ * Parses the `.checkcryptoignore` file in the specified directory and returns ignore rules for files and strings.
+ *
+ * Ignores empty lines and comments. Lines matching a 64-character hexadecimal string are treated as string ignores; all other lines are treated as file or directory patterns.
+ *
+ * @param workingDirectory - The directory to search for the `.checkcryptoignore` file. Defaults to the current working directory.
+ * @returns An `IgnoreRules` object containing file patterns and string ignores.
  */
 function parseIgnoreFile(workingDirectory = process.cwd()) {
     const ignoreFilePath = path.join(workingDirectory, IGNORE_FILE_NAME);
@@ -92,7 +103,14 @@ function parseIgnoreFile(workingDirectory = process.cwd()) {
 }
 exports.parseIgnoreFile = parseIgnoreFile;
 /**
- * Check if a potential crypto finding should be ignored
+ * Determines whether a found string in a file should be ignored based on provided ignore rules.
+ *
+ * Returns `true` if the file path matches any ignore pattern or if the found string is listed in the set of ignored strings; otherwise, returns `false`.
+ *
+ * @param foundString - The string detected in the file to check for ignoring
+ * @param filePath - The path of the file where the string was found
+ * @param rules - The ignore rules containing file patterns and string ignores
+ * @returns `true` if the finding should be ignored; otherwise, `false`
  */
 function shouldIgnore(foundString, filePath, rules) {
     // Check if file is ignored by pattern
@@ -191,6 +209,11 @@ const github = __importStar(__nccwpck_require__(5438));
 const inputs_1 = __nccwpck_require__(6180);
 const processing_1 = __nccwpck_require__(4932);
 const notifications_1 = __nccwpck_require__(9793);
+/**
+ * Executes the main GitHub Action workflow, handling input parsing, diff processing, summary generation, notifications, and output setting.
+ *
+ * Orchestrates the end-to-end process for the action, including conditional notifications via check runs or issue comments, and marks the workflow as failed if required.
+ */
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {

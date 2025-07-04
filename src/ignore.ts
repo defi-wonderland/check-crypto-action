@@ -10,7 +10,13 @@ export interface IgnoreRules {
 const IGNORE_FILE_NAME = '.checkcryptoignore';
 
 /**
- * Check if a file path matches any ignore pattern
+ * Determines whether a file path matches any of the provided ignore patterns.
+ *
+ * Patterns ending with '/' are treated as directory patterns and match any file within that directory. Other patterns match exact file names or files within subdirectories.
+ *
+ * @param filePath - The path of the file to check
+ * @param patterns - An array of ignore patterns to match against
+ * @returns `true` if the file path matches any pattern; otherwise, `false`
  */
 function isFileIgnored(filePath: string, patterns: string[]): boolean {
   return patterns.some(pattern => {
@@ -30,7 +36,12 @@ function isFileIgnored(filePath: string, patterns: string[]): boolean {
 }
 
 /**
- * Parse the ignore file and return structured rules
+ * Parses the `.checkcryptoignore` file in the specified directory and returns ignore rules for files and strings.
+ *
+ * Ignores empty lines and comments. Lines matching a 64-character hexadecimal string are treated as string ignores; all other lines are treated as file or directory patterns.
+ *
+ * @param workingDirectory - The directory to search for the `.checkcryptoignore` file. Defaults to the current working directory.
+ * @returns An `IgnoreRules` object containing file patterns and string ignores.
  */
 export function parseIgnoreFile(workingDirectory: string = process.cwd()): IgnoreRules {
   const ignoreFilePath = path.join(workingDirectory, IGNORE_FILE_NAME);
@@ -78,7 +89,14 @@ export function parseIgnoreFile(workingDirectory: string = process.cwd()): Ignor
 }
 
 /**
- * Check if a potential crypto finding should be ignored
+ * Determines whether a found string in a file should be ignored based on provided ignore rules.
+ *
+ * Returns `true` if the file path matches any ignore pattern or if the found string is listed in the set of ignored strings; otherwise, returns `false`.
+ *
+ * @param foundString - The string detected in the file to check for ignoring
+ * @param filePath - The path of the file where the string was found
+ * @param rules - The ignore rules containing file patterns and string ignores
+ * @returns `true` if the finding should be ignored; otherwise, `false`
  */
 export function shouldIgnore(foundString: string, filePath: string, rules: IgnoreRules): boolean {
   // Check if file is ignored by pattern
