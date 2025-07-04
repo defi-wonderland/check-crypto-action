@@ -3,22 +3,43 @@
 # This file allows you to ignore false positives in crypto key detection.
 # Lines starting with # are comments and will be ignored.
 # Empty lines are also ignored.
+# 
+# This file supports full glob patterns for flexible file matching.
 
-# ===== DIRECTORY PATTERNS =====
-# Ignore entire directories (use trailing slash)
-# Examples:
-tests/                    # Ignore tests directory and all contents
-__tests__/                # Ignore __tests__ directory and all contents
-fixtures/                 # Ignore fixtures directory
-examples/                 # Ignore examples directory
-docs/                     # Ignore documentation directory
+# ===== GLOB PATTERNS =====
+# Use glob patterns for powerful file matching with wildcards
+
+# Ignore all test files anywhere in the project
+**/*test*.ts             # Any TypeScript file containing "test"
+**/*spec*.js             # Any JavaScript file containing "spec"
+**/*.test.tsx            # Any React test files
+**/*.spec.json           # Any JSON spec files
+
+# Ignore entire directories and their contents
+**/node_modules/**       # All node_modules directories
+**/fixtures/**           # All fixtures directories
+**/mocks/**              # All mocks directories
+**/coverage/**           # All coverage directories
+**/tests/**              # All tests directories
+**/__tests__/**          # All __tests__ directories
+
+# Ignore specific file types
+*.log                    # All log files
+*.tmp                    # All temporary files
+*.env*                   # All environment files (.env, .env.local, etc.)
+*.map                    # All source map files
+
+# Complex patterns
+src/**/temp/**           # Temp directories anywhere under src
+build/**/*.map           # All .map files in build directory
+dist/**                  # Everything in dist directory
 
 # ===== FILE PATTERNS =====
-# Ignore specific files (matches anywhere in project)
-# Examples:
-README.md                 # Ignore any README.md file
-package-lock.json         # Ignore package lock files
-.env                      # Ignore environment files
+# Ignore specific files by exact name
+README.md                # Ignore any README.md file
+package-lock.json        # Ignore package lock files
+yarn.lock                # Ignore yarn lock files
+LICENSE                  # Ignore license files
 
 # ===== SPECIFIC HEX STRINGS =====
 # Ignore specific 64-character hex strings that are not private keys
@@ -26,25 +47,3 @@ package-lock.json         # Ignore package lock files
 # Examples:
 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  # Example hash used in docs
 0000000000000000000000000000000000000000000000000000000000000000  # Null hash
-
-
-# ===== COMMON PATTERNS TO IGNORE =====
-# Here are some common patterns you might want to ignore:
-
-# Test directories
-tests/
-__tests__/
-__mocks__/
-test/
-
-# Build outputs  
-dist/
-build/
-out/
-
-# Dependencies
-node_modules/
-
-# Documentation
-docs/
-README.md 

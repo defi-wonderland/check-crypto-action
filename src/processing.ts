@@ -55,7 +55,7 @@ export const processDiff = (diff: string): Result => {
       // Log helpful info for found keys
       filteredPrivateKeys.forEach(key => {
         core.info(`Found potential private key: ${key} in ${currentFile}`);
-        core.info(`💡 False positive? Add to .checkcryptoignore: ${key} or ${currentFile}`);
+        core.info(`💡 False positive? Add to .checkcryptoignore: ${key} or use glob patterns like **/*test*.ts`);
       });
 
       foundPrivates = getNewKeysMap(filteredPrivateKeys, foundPrivates, currentFile);
@@ -105,7 +105,7 @@ export const getSummary = (
 
   // Add comprehensive false positive guidance if any keys were found
   if (privateKeys.length || (reportPublicKeys && publicKeys.length)) {
-    summary += '💡 **False positive?** Add the key or file pattern to `.checkcryptoignore` in your repo root:\n';
+    summary += '💡 **False positive?** Add the key or glob pattern to `.checkcryptoignore` in your repo root:\n';
     summary += '```\n';
     summary += '# Ignore specific keys\n';
 
@@ -132,10 +132,14 @@ export const getSummary = (
       summary += `${file}\n`;
     });
 
-    summary += '\n# Or ignore directories (use trailing slash)\n';
-    summary += 'tests/\n';
+    summary += '\n# Or use glob patterns\n';
+    summary += '**/*test*.ts     # All test files\n';
+    summary += '**/fixtures/**   # All fixtures directories\n';
+    summary += 'docs/**          # All files in docs\n';
 
     summary += '```\n\n';
+    summary +=
+      '📖 **Learn more:** [Glob patterns documentation](https://github.com/defi-wonderland/check-crypto-action#ignoring-false-positives)\n\n';
   }
 
   if (passed) {
