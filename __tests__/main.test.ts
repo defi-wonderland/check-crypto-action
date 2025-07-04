@@ -1,7 +1,7 @@
 import { expect, test, describe } from '@jest/globals';
 
 import { processDiff } from '../src/processing';
-const test = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+
 describe('Main tests', () => {
   const leakPart = 'dbf71f6e79781beaded0b24fdc3e22cf6fc56e';
 
