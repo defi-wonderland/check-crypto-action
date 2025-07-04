@@ -20,6 +20,8 @@
 **/fixtures/**           # All fixtures directories
 **/mocks/**              # All mocks directories
 **/coverage/**           # All coverage directories
+**/tests/**              # All tests directories
+**/__tests__/**          # All __tests__ directories
 
 # Ignore specific file types
 *.log                    # All log files
@@ -31,13 +33,6 @@
 src/**/temp/**           # Temp directories anywhere under src
 build/**/*.map           # All .map files in build directory
 dist/**                  # Everything in dist directory
-
-# ===== DIRECTORY PATTERNS =====
-# Simple directory patterns (trailing slash optional)
-tests/                   # Ignore tests directory and all contents
-__tests__/               # Ignore __tests__ directory and all contents
-docs/                    # Ignore documentation directory
-examples/                # Ignore examples directory
 
 # ===== FILE PATTERNS =====
 # Ignore specific files by exact name

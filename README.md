@@ -59,7 +59,9 @@ You can create a `.checkcryptoignore` file in your repository root to ignore fal
 
 ### Glob Patterns
 
-The ignore file supports full glob pattern matching with wildcards and directory traversal:
+The ignore file supports full glob pattern matching with wildcards and directory traversal.
+
+**Note:** To ignore directories, you must use explicit glob patterns with wildcards (e.g., `**/__tests__/**`). Simple directory names like `__tests__/` will not work as expected.
 
 ```
 # Ignore all test files anywhere in the project
@@ -67,9 +69,10 @@ The ignore file supports full glob pattern matching with wildcards and directory
 **/*spec*.js
 
 # Ignore entire directories and their contents
-**/fixtures/**
-**/node_modules/**
-docs/**
+**/fixtures/**        # All fixtures directories anywhere
+**/tests/**            # All tests directories anywhere
+**/__tests__/**        # All __tests__ directories anywhere
+docs/**                # All files in docs directory (from root)
 
 # Ignore specific file types
 *.log
@@ -83,16 +86,6 @@ package-lock.json
 # Complex patterns
 src/**/temp/**
 build/**/*.map
-```
-
-### Directory Patterns
-
-```
-# Ignore entire directories (trailing slash optional)
-tests/
-__tests__/
-docs/
-fixtures/
 ```
 
 ### Specific Hex Strings
@@ -120,7 +113,7 @@ fixtures/
 **/*test*.ts
 **/*spec*.js
 **/fixtures/**
-__tests__/
+**/__tests__/**
 
 # Documentation
 docs/**
