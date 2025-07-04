@@ -1,0 +1,49 @@
+# .checkcryptoignore
+# 
+# This file allows you to ignore false positives in crypto key detection.
+# Lines starting with # are comments and will be ignored.
+# Empty lines are also ignored.
+# 
+# This file supports full glob patterns for flexible file matching.
+
+# ===== GLOB PATTERNS =====
+# Use glob patterns for powerful file matching with wildcards
+
+# Ignore all test files anywhere in the project
+**/*test*.ts             # Any TypeScript file containing "test"
+**/*spec*.js             # Any JavaScript file containing "spec"
+**/*.test.tsx            # Any React test files
+**/*.spec.json           # Any JSON spec files
+
+# Ignore entire directories and their contents
+**/node_modules/**       # All node_modules directories
+**/fixtures/**           # All fixtures directories
+**/mocks/**              # All mocks directories
+**/coverage/**           # All coverage directories
+**/tests/**              # All tests directories
+**/__tests__/**          # All __tests__ directories
+
+# Ignore specific file types
+*.log                    # All log files
+*.tmp                    # All temporary files
+*.env*                   # All environment files (.env, .env.local, etc.)
+*.map                    # All source map files
+
+# Complex patterns
+src/**/temp/**           # Temp directories anywhere under src
+build/**/*.map           # All .map files in build directory
+dist/**                  # Everything in dist directory
+
+# ===== FILE PATTERNS =====
+# Ignore specific files by exact name
+README.md                # Ignore any README.md file
+package-lock.json        # Ignore package lock files
+yarn.lock                # Ignore yarn lock files
+LICENSE                  # Ignore license files
+
+# ===== SPECIFIC HEX STRINGS =====
+# Ignore specific 64-character hex strings that are not private keys
+# Each line should contain exactly 64 hex characters
+# Examples:
+1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  # Example hash used in docs
+0000000000000000000000000000000000000000000000000000000000000000  # Null hash

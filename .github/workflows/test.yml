@@ -6,9 +6,15 @@ on: # rebuild any PRs and main branch changes
       - main
       - 'releases/*'
 
+# Default permissions for all jobs (can be overridden per job)
+permissions:
+  contents: read
+
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +26,10 @@ jobs:
 
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -30,10 +40,15 @@ jobs:
           branch: dev
           notify_issue: false
           notify_check: true
+          report_public_keys: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   testOnlyNotify: # make sure the action only notifies without failing
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -43,4 +58,5 @@ jobs:
           title: Check pk only notify
           branch: dev
           only_notify: true
+          report_public_keys: true
           token: ${{ secrets.GITHUB_TOKEN }}

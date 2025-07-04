@@ -4,6 +4,11 @@ import { parseInputs } from './inputs';
 import { fetchDiff, processDiff, getSummary } from './processing';
 import { createRun, createComment } from './notifications';
 
+/**
+ * Executes the main GitHub Action workflow, handling input parsing, diff processing, summary generation, notifications, and output setting.
+ *
+ * Orchestrates the end-to-end process for the action, including conditional notifications via check runs or issue comments, and marks the workflow as failed if required.
+ */
 async function run(): Promise<void> {
   try {
     core.debug(`Parsing inputs`);
@@ -25,13 +30,21 @@ async function run(): Promise<void> {
 
       if (inputs.notifications.check) {
         core.debug(`Notification: Check Run`);
-        await createRun(octokit, github.context, result, summary, inputs.notifications.label);
+        try {
+          await createRun(octokit, github.context, result, summary, inputs.notifications.label);
+        } catch (error) {
+          core.warning(`Failed to create check run: ${error instanceof Error ? error.message : error}`);
+        }
       }
       if (notifyIssue) {
         core.debug(`Notification: Issue`);
         const issueId = github.context.issue.number;
         if (issueId || issueId === 0) {
-          await createComment(octokit, github.context, result, summary, inputs.notifications.label);
+          try {
+            await createComment(octokit, github.context, result, summary, inputs.notifications.label);
+          } catch (error) {
+            core.warning(`Failed to create PR comment: ${error instanceof Error ? error.message : error}`);
+          }
         } else {
           core.debug(`Notification: no issue id`);
         }

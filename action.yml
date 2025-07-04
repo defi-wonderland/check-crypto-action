@@ -1,6 +1,10 @@
 name: 'Check Crypto Action'
 description: 'An action to check for crypto private keys in pushed code'
 author: 'Wonderland'
+# Required permissions:
+#   contents: read (always required - to read repository code and git diffs)
+#   checks: write (optional - only if notify_check: true)
+#   pull-requests: write (optional - only if notify_issue: true on PRs)
 inputs:
   token:
     description: 'your GITHUB_TOKEN, used when sending the notification'
@@ -10,7 +14,7 @@ inputs:
     required: false
   notify_issue:
     description: 'send a notification to the linked issue/pullrequest with the summary'
-    default: true
+    default: 'true'
     required: false
   notify_check:
     description: 'create a check run with the summary'

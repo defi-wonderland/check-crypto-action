@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import { execSync } from 'child_process';
 import clone from 'just-clone';
+import { parseIgnoreFile, shouldIgnore, IgnoreRules } from './ignore';
 
 export type Result = {
   passed: boolean;
@@ -20,6 +21,9 @@ export const fetchDiff = (branch = 'main'): string => {
 };
 
 export const processDiff = (diff: string): Result => {
+  // Load ignore rules
+  const ignoreRules = parseIgnoreFile();
+
   let currentFile = '';
   let foundAddresses: AddressObject = {};
   let foundPrivates: AddressObject = {};
@@ -33,11 +37,28 @@ export const processDiff = (diff: string): Result => {
     if ((line && line[0] === '-') || line[0] === '+') {
       // NOTE Regexp for public addresses
       const publicKeysFound = [...line.matchAll(/0x[a-fA-F0-9]{40}/g)].flat();
-      foundAddresses = getNewKeysMap(publicKeysFound, foundAddresses, currentFile);
+      const filteredPublicKeys = publicKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+
+      // Log helpful info for found public keys (if any)
+      if (filteredPublicKeys.length > 0) {
+        filteredPublicKeys.forEach(key => {
+          core.debug(`Found potential public key: ${key} in ${currentFile}`);
+        });
+      }
+
+      foundAddresses = getNewKeysMap(filteredPublicKeys, foundAddresses, currentFile);
 
       // NOTE Regexp for private addresses
       const privateKeysFound = [...line.matchAll(/[1234567890abcdefABCDEF]{64}/g)].flat();
-      foundPrivates = getNewKeysMap(privateKeysFound, foundPrivates, currentFile);
+      const filteredPrivateKeys = privateKeysFound.filter(key => !shouldIgnore(key, currentFile, ignoreRules));
+
+      // Log helpful info for found keys
+      filteredPrivateKeys.forEach(key => {
+        core.info(`Found potential private key: ${key} in ${currentFile}`);
+        core.info(`💡 False positive? Add to .checkcryptoignore: ${key} or use glob patterns like **/*test*.ts`);
+      });
+
+      foundPrivates = getNewKeysMap(filteredPrivateKeys, foundPrivates, currentFile);
     }
   });
 
@@ -65,7 +86,9 @@ export const getSummary = (
     summary += '🚨 Possible private keys found: \n';
 
     privateKeys.forEach(key => {
-      summary += `- Private key \`${key}\` in file/s ${foundPrivates[key].files.join(', ')}  \n`;
+      // Wrap file paths in backticks to prevent markdown formatting issues
+      const wrappedFiles = foundPrivates[key].files.map(file => `\`${file}\``);
+      summary += `- Private key \`${key}\` in file/s ${wrappedFiles.join(', ')}  \n`;
     });
     summary += '\n';
   }
@@ -73,9 +96,50 @@ export const getSummary = (
   if (reportPublicKeys && publicKeys.length) {
     summary += '⚠️ Possible public keys found: \n';
     publicKeys.forEach(key => {
-      summary += `- Public key \`${key}\` in file/s ${foundAddresses[key].files.join(', ')} \n`;
+      // Wrap file paths in backticks to prevent markdown formatting issues
+      const wrappedFiles = foundAddresses[key].files.map(file => `\`${file}\``);
+      summary += `- Public key \`${key}\` in file/s ${wrappedFiles.join(', ')} \n`;
     });
     summary += '\n';
+  }
+
+  // Add comprehensive false positive guidance if any keys were found
+  if (privateKeys.length || (reportPublicKeys && publicKeys.length)) {
+    summary += '💡 **False positive?** Add the key or glob pattern to `.checkcryptoignore` in your repo root:\n';
+    summary += '```\n';
+    summary += '# Ignore specific keys\n';
+
+    // Add all found keys
+    privateKeys.forEach(key => {
+      summary += `${key}\n`;
+    });
+    if (reportPublicKeys) {
+      publicKeys.forEach(key => {
+        summary += `${key}\n`;
+      });
+    }
+
+    summary += '\n# Or ignore files/patterns\n';
+
+    // Add all unique file paths
+    const allFiles = [
+      ...new Set([
+        ...privateKeys.flatMap(key => foundPrivates[key].files),
+        ...(reportPublicKeys ? publicKeys.flatMap(key => foundAddresses[key].files) : []),
+      ]),
+    ];
+    allFiles.forEach(file => {
+      summary += `${file}\n`;
+    });
+
+    summary += '\n# Or use glob patterns\n';
+    summary += '**/*test*.ts     # All test files\n';
+    summary += '**/fixtures/**   # All fixtures directories\n';
+    summary += 'docs/**          # All files in docs\n';
+
+    summary += '```\n\n';
+    summary +=
+      '📖 **Learn more:** [Glob patterns documentation](https://github.com/defi-wonderland/check-crypto-action#ignoring-false-positives)\n\n';
   }
 
   if (passed) {
